@@ -28,6 +28,35 @@ create or replace trigger set_task_sales_id_trigger
     before insert on public.tasks
     for each row execute function public.set_sales_id_default();
 
+-- Auto-populate escritorio_id from current auth user on insert
+create or replace trigger set_company_escritorio_id_trigger
+    before insert on public.companies
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_contact_escritorio_id_trigger
+    before insert on public.contacts
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_contact_notes_escritorio_id_trigger
+    before insert on public.contact_notes
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_deal_escritorio_id_trigger
+    before insert on public.deals
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_deal_notes_escritorio_id_trigger
+    before insert on public.deal_notes
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_task_escritorio_id_trigger
+    before insert on public.tasks
+    for each row execute function public.set_escritorio_id_default();
+
+create or replace trigger set_tag_escritorio_id_trigger
+    before insert on public.tags
+    for each row execute function public.set_escritorio_id_default();
+
 -- Auto-fetch company logo from website favicon on save
 create or replace trigger company_saved
     before insert or update on public.companies

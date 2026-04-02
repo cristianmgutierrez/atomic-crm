@@ -27,5 +27,10 @@ export const canAccess = <
     return false;
   }
 
+  // Non admins can't access the escritorios resource
+  if (params.resource === "escritorios") {
+    return false;
+  }
+
   return true;
 };

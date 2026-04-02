@@ -29,6 +29,17 @@ async function updateSaleAdministrator(
   return sales.at(0);
 }
 
+async function updateSaleEscritorioAndPapel(
+  user_id: string,
+  escritorio_id: number | null,
+  papel: string | null,
+) {
+  return await supabaseAdmin
+    .from("sales")
+    .update({ escritorio_id, papel })
+    .eq("user_id", user_id);
+}
+
 async function createSale(
   user_id: string,
   data: {
@@ -38,6 +49,8 @@ async function createSale(
     last_name: string;
     disabled: boolean;
     administrator: boolean;
+    escritorio_id?: number | null;
+    papel?: string | null;
   },
 ) {
   const { data: sales, error: salesError } = await supabaseAdmin
@@ -67,8 +80,16 @@ async function updateSaleAvatar(user_id: string, avatar: string) {
 }
 
 async function inviteUser(req: Request, currentUserSale: any) {
-  const { email, password, first_name, last_name, disabled, administrator } =
-    await req.json();
+  const {
+    email,
+    password,
+    first_name,
+    last_name,
+    disabled,
+    administrator,
+    escritorio_id,
+    papel,
+  } = await req.json();
 
   if (!currentUserSale.administrator) {
     return createErrorResponse(401, "Not Authorized");
@@ -77,7 +98,7 @@ async function inviteUser(req: Request, currentUserSale: any) {
   const { data, error: userError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
-    user_metadata: { first_name, last_name },
+    user_metadata: { first_name, last_name, escritorio_id, papel },
   });
 
   let user = data?.user;
@@ -121,6 +142,8 @@ async function inviteUser(req: Request, currentUserSale: any) {
         last_name,
         disabled,
         administrator,
+        escritorio_id,
+        papel,
       });
 
       return new Response(
@@ -187,6 +210,8 @@ async function patchUser(req: Request, currentUserSale: any) {
     avatar,
     administrator,
     disabled,
+    escritorio_id,
+    papel,
   } = await req.json();
   const { data: sale } = await supabaseAdmin
     .from("sales")
@@ -241,6 +266,7 @@ async function patchUser(req: Request, currentUserSale: any) {
 
   try {
     await updateSaleDisabled(data.user.id, disabled);
+    await updateSaleEscritorioAndPapel(data.user.id, escritorio_id, papel);
     const sale = await updateSaleAdministrator(data.user.id, administrator);
     return new Response(
       JSON.stringify({

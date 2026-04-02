@@ -24,6 +24,8 @@ export type SalesFormData = {
   last_name: string;
   administrator: boolean;
   disabled: boolean;
+  escritorio_id?: Identifier;
+  papel?: "gestor" | "assessor";
 };
 
 export type Sale = {
@@ -33,6 +35,8 @@ export type Sale = {
   avatar?: RAFile;
   disabled?: boolean;
   user_id: string;
+  escritorio_id?: Identifier;
+  papel?: "gestor" | "assessor";
 
   /**
    * This is a copy of the user's email, to make it easier to handle by react admin
@@ -46,6 +50,11 @@ export type Sale = {
    * @deprecated
    */
   password?: string;
+} & Pick<RaRecord, "id">;
+
+export type Escritorio = {
+  name: string;
+  created_at: string;
 } & Pick<RaRecord, "id">;
 
 export type Company = {

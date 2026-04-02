@@ -234,13 +234,15 @@ begin
   select count(id) into sales_count
   from public.sales;
 
-  insert into public.sales (first_name, last_name, email, user_id, administrator)
+  insert into public.sales (first_name, last_name, email, user_id, administrator, escritorio_id, papel)
   values (
     coalesce(new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data -> 'custom_claims' ->> 'first_name', 'Pending'),
     coalesce(new.raw_user_meta_data ->> 'last_name', new.raw_user_meta_data -> 'custom_claims' ->> 'last_name', 'Pending'),
     new.email,
     new.id,
-    case when sales_count > 0 then FALSE else TRUE end
+    case when sales_count > 0 then FALSE else TRUE end,
+    (new.raw_user_meta_data ->> 'escritorio_id')::bigint,
+    coalesce(new.raw_user_meta_data ->> 'papel', 'assessor')
   );
   return new;
 end;
@@ -422,6 +424,39 @@ BEGIN
   DELETE FROM contacts WHERE id = loser_id;
 
   RETURN winner_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."get_my_sales_id"() RETURNS bigint
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  SELECT id FROM public.sales WHERE user_id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."get_my_escritorio_id"() RETURNS bigint
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  SELECT escritorio_id FROM public.sales WHERE user_id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."get_my_papel"() RETURNS text
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  SELECT papel FROM public.sales WHERE user_id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION "public"."set_escritorio_id_default"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+  IF NEW.escritorio_id IS NULL THEN
+    SELECT escritorio_id INTO NEW.escritorio_id FROM sales WHERE user_id = auth.uid();
+  END IF;
+  RETURN NEW;
 END;
 $$;
 

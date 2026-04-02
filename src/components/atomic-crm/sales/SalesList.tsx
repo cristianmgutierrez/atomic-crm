@@ -3,7 +3,9 @@ import { CreateButton } from "@/components/admin/create-button";
 import { DataTable } from "@/components/admin/data-table";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
+import { ReferenceField } from "@/components/admin/reference-field";
 import { SearchInput } from "@/components/admin/search-input";
+import { TextField } from "@/components/admin/text-field";
 import { Badge } from "@/components/ui/badge";
 
 import { TopToolbar } from "../layout/TopToolbar";
@@ -54,6 +56,16 @@ export function SalesList() {
         <DataTable.Col source="first_name" />
         <DataTable.Col source="last_name" />
         <DataTable.Col source="email" />
+        <DataTable.Col source="escritorio_id" label="Escritório">
+          <ReferenceField
+            source="escritorio_id"
+            reference="escritorios"
+            link={false}
+          >
+            <TextField source="name" />
+          </ReferenceField>
+        </DataTable.Col>
+        <DataTable.Col source="papel" label="Papel" />
         <DataTable.Col label={false}>
           <OptionsField />
         </DataTable.Col>
