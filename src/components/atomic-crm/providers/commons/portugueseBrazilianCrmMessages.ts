@@ -1,0 +1,551 @@
+import type { CrmMessages } from "./englishCrmMessages";
+
+export const portugueseBrazilianCrmMessages = {
+  resources: {
+    companies: {
+      name: "Empresa |||| Empresas",
+      forcedCaseName: "Empresa",
+      fields: {
+        name: "Nome da empresa",
+        website: "Site",
+        linkedin_url: "LinkedIn",
+        phone_number: "Telefone",
+        created_at: "Criado em",
+        nb_contacts: "Número de contatos",
+        revenue: "Receita",
+        sector: "Setor",
+        size: "Porte",
+        tax_identifier: "CNPJ/CPF",
+        address: "Endereço",
+        city: "Cidade",
+        zipcode: "CEP",
+        state_abbr: "Estado",
+        country: "País",
+        description: "Descrição",
+        context_links: "Links de contexto",
+        sales_id: "Responsável",
+      },
+      empty: {
+        description: "Parece que sua lista de empresas está vazia.",
+        title: "Nenhuma empresa encontrada",
+      },
+      field_categories: {
+        contact: "Contato",
+        additional_info: "Informações adicionais",
+        address: "Endereço",
+        context: "Contexto",
+      },
+      action: {
+        create: "Criar Empresa",
+        edit: "Editar empresa",
+        new: "Nova Empresa",
+        show: "Ver empresa",
+      },
+      added_on: "Adicionado em %{date}",
+      followed_by: "Seguido por %{name}",
+      followed_by_you: "Seguido por você",
+      no_contacts: "Sem contatos",
+      nb_contacts: "%{smart_count} contato |||| %{smart_count} contatos",
+      nb_deals: "%{smart_count} negócio |||| %{smart_count} negócios",
+      sizes: {
+        one_employee: "1 funcionário",
+        two_to_nine_employees: "2-9 funcionários",
+        ten_to_forty_nine_employees: "10-49 funcionários",
+        fifty_to_two_hundred_forty_nine_employees: "50-249 funcionários",
+        two_hundred_fifty_or_more_employees: "250 ou mais funcionários",
+      },
+      autocomplete: {
+        create_error: "Ocorreu um erro ao criar a empresa",
+        create_item: "Criar %{item}",
+        create_label: "Digite para criar uma nova empresa",
+      },
+      filters: {
+        only_mine: "Apenas empresas que gerencio",
+      },
+    },
+    contacts: {
+      name: "Contato |||| Contatos",
+      forcedCaseName: "Contato",
+      field_categories: {
+        background_info: "Informações de perfil",
+        identity: "Identidade",
+        misc: "Outros",
+        personal_info: "Informações pessoais",
+        position: "Cargo",
+      },
+      fields: {
+        first_name: "Nome",
+        last_name: "Sobrenome",
+        last_seen: "Último contato",
+        title: "Título",
+        company_id: "Empresa",
+        email_jsonb: "Endereços de e-mail",
+        email: "E-mail",
+        phone_jsonb: "Números de telefone",
+        phone_number: "Telefone",
+        linkedin_url: "LinkedIn",
+        background: "Perfil (bio, como se conheceram, etc.)",
+        has_newsletter: "Recebe newsletter",
+        sales_id: "Responsável",
+      },
+      action: {
+        add: "Adicionar contato",
+        add_first: "Adicione seu primeiro contato",
+        create: "Criar contato",
+        edit: "Editar contato",
+        export_vcard: "Exportar para vCard",
+        new: "Novo Contato",
+        show: "Ver contato",
+      },
+      background: {
+        last_activity_on: "Última atividade em %{date}",
+        added_on: "Adicionado em %{date}",
+        followed_by: "Seguido por %{name}",
+        followed_by_you: "Seguido por você",
+        status_none: "Nenhum",
+      },
+      position_at: "%{title} em",
+      position_at_company: "%{title} na %{company}",
+      empty: {
+        description: "Parece que sua lista de contatos está vazia.",
+        title: "Nenhum contato encontrado",
+      },
+      import: {
+        title: "Importar contatos",
+        button: "Importar CSV",
+        complete:
+          "Importação concluída. %{importCount} contatos importados, com %{errorCount} erros",
+        progress:
+          "Importados %{importCount} / %{rowCount} contatos, com %{errorCount} erros.",
+        error:
+          "Falha ao importar o arquivo. Verifique se é um CSV válido.",
+        imported: "Importado",
+        remaining_time: "Tempo estimado restante:",
+        running: "A importação está em andamento, não feche esta aba.",
+        sample_download: "Baixar CSV de exemplo",
+        sample_hint: "Aqui está um CSV de exemplo que você pode usar como modelo",
+        stop: "Parar importação",
+        csv_file: "Arquivo CSV",
+        contacts_label: "contato |||| contatos",
+      },
+      inputs: {
+        genders: {
+          male: "Ele/Dele",
+          female: "Ela/Dela",
+          nonbinary: "Eles/Deles",
+        },
+        personal_info_types: {
+          work: "Trabalho",
+          home: "Casa",
+          other: "Outro",
+        },
+      },
+      list: {
+        error_loading: "Erro ao carregar contatos",
+      },
+      bulk_tag: {
+        action: "Etiquetar",
+        back: "Voltar para etiquetas",
+        create_description:
+          "Crie uma nova etiqueta e aplique aos contatos selecionados.",
+        description:
+          "Escolha uma etiqueta existente ou crie uma nova para os contatos selecionados.",
+        empty: "Nenhuma etiqueta ainda. Crie uma para etiquetar os contatos.",
+        error: "Falha ao adicionar etiqueta aos contatos",
+        noop: "Os contatos selecionados já possuem esta etiqueta",
+        success:
+          "Etiqueta adicionada a %{smart_count} contato |||| Etiqueta adicionada a %{smart_count} contatos",
+        title: "Adicionar etiqueta aos contatos",
+      },
+      merge: {
+        action: "Mesclar com outro contato",
+        confirm: "Mesclar Contatos",
+        current_contact: "Contato Atual (será excluído)",
+        description: "Mescle este contato com outro.",
+        error: "Falha ao mesclar contatos",
+        merging: "Mesclando...",
+        no_additional_data: "Nenhum dado adicional para mesclar",
+        select_target: "Selecione um contato para mesclar",
+        success: "Contatos mesclados com sucesso",
+        target_contact: "Contato Destino (será mantido)",
+        title: "Mesclar Contato",
+        warning_description:
+          "Todos os dados serão transferidos para o segundo contato. Esta ação não pode ser desfeita.",
+        warning_title: "Atenção: Operação Destrutiva",
+        what_will_be_merged: "O que será mesclado:",
+      },
+      filters: {
+        before_last_month: "Antes do mês passado",
+        before_this_month: "Antes deste mês",
+        before_this_week: "Antes desta semana",
+        managed_by_me: "Gerenciado por mim",
+        search: "Buscar nome, empresa...",
+        this_week: "Esta semana",
+        today: "Hoje",
+        tags: "Etiquetas",
+        tasks: "Tarefas",
+      },
+      hot: {
+        empty_change_status:
+          'Mude o status de um contato adicionando uma nota e clicando em "mostrar opções".',
+        empty_hint: 'Contatos com status "quente" aparecerão aqui.',
+        title: "Contatos Quentes",
+      },
+    },
+    deals: {
+      name: "Negócio |||| Negócios",
+      fields: {
+        name: "Nome",
+        description: "Descrição",
+        company_id: "Empresa",
+        contact_ids: "Contatos",
+        category: "Categoria",
+        amount: "Valor",
+        expected_closing_date: "Previsão de fechamento",
+        stage: "Etapa",
+      },
+      action: {
+        back_to_deal: "Voltar ao negócio",
+        create: "Criar negócio",
+        new: "Novo Negócio",
+      },
+      field_categories: {
+        misc: "Outros",
+      },
+      archived: {
+        action: "Arquivar",
+        error: "Erro: negócio não arquivado",
+        list_title: "Negócios Arquivados",
+        success: "Negócio arquivado",
+        title: "Negócio Arquivado",
+        view: "Ver negócios arquivados",
+      },
+      inputs: {
+        linked_to: "Vinculado a",
+      },
+      unarchived: {
+        action: "Enviar de volta ao quadro",
+        error: "Erro: negócio não desarquivado",
+        success: "Negócio desarquivado",
+      },
+      updated: "Negócio atualizado",
+      empty: {
+        before_create: "antes de criar um negócio.",
+        description: "Parece que sua lista de negócios está vazia.",
+        title: "Nenhum negócio encontrado",
+      },
+      invalid_date: "Data inválida",
+    },
+    notes: {
+      name: "Nota |||| Notas",
+      forcedCaseName: "Nota",
+      fields: {
+        status: "Status",
+        date: "Data",
+        attachments: "Anexos",
+        contact_id: "Contato",
+        deal_id: "Negócio",
+      },
+      action: {
+        add: "Adicionar nota",
+        add_first: "Adicione sua primeira nota",
+        delete: "Excluir nota",
+        edit: "Editar nota",
+        update: "Atualizar nota",
+        add_this: "Adicionar esta nota",
+      },
+      sheet: {
+        create: "Criar nota",
+        create_for: "Criar nota para %{name}",
+        edit: "Editar nota",
+        edit_for: "Editar nota de %{name}",
+      },
+      deleted: "Nota excluída",
+      empty: "Nenhuma nota ainda",
+      author_added: "%{name} adicionou uma nota",
+      you_added: "Você adicionou uma nota",
+      me: "Eu",
+      list: {
+        error_loading: "Erro ao carregar notas",
+      },
+      note_for_contact: "Nota para %{name}",
+      stepper: {
+        hint: "Vá a uma página de contato e adicione uma nota",
+      },
+      added: "Nota adicionada",
+      inputs: {
+        add_note: "Adicionar uma nota",
+        options_hint: "(anexar arquivos ou alterar detalhes)",
+        show_options: "Mostrar opções",
+      },
+      validation: {
+        note_or_attachment_required: "Uma nota ou um anexo é obrigatório",
+      },
+    },
+    sales: {
+      name: "Usuário |||| Usuários",
+      fields: {
+        first_name: "Nome",
+        last_name: "Sobrenome",
+        email: "E-mail",
+        administrator: "Admin",
+        disabled: "Desativado",
+      },
+      create: {
+        error: "Ocorreu um erro ao criar o usuário.",
+        success:
+          "Usuário criado. Em breve receberá um e-mail para definir a senha.",
+        title: "Criar novo usuário",
+      },
+      edit: {
+        error: "Ocorreu um erro. Tente novamente.",
+        record_not_found: "Registro não encontrado",
+        success: "Usuário atualizado com sucesso",
+        title: "Editar %{name}",
+      },
+      action: {
+        new: "Novo usuário",
+      },
+    },
+    tasks: {
+      name: "Tarefa |||| Tarefas",
+      forcedCaseName: "Tarefa",
+      fields: {
+        text: "Descrição",
+        due_date: "Data limite",
+        type: "Tipo",
+        contact_id: "Contato",
+        due_short: "prazo",
+      },
+      action: {
+        add: "Adicionar tarefa",
+        create: "Criar tarefa",
+        edit: "Editar tarefa",
+      },
+      actions: {
+        postpone_next_week: "Adiar para a próxima semana",
+        postpone_tomorrow: "Adiar para amanhã",
+        title: "ações da tarefa",
+      },
+      added: "Tarefa adicionada",
+      deleted: "Tarefa excluída com sucesso",
+      dialog: {
+        create: "Criar tarefa",
+        create_for: "Criar tarefa para %{name}",
+      },
+      sheet: {
+        edit: "Editar tarefa",
+        edit_for: "Editar tarefa de %{name}",
+      },
+      empty: "Nenhuma tarefa ainda",
+      empty_list_hint: "Tarefas adicionadas aos seus contatos aparecerão aqui.",
+      filters: {
+        later: "Mais tarde",
+        overdue: "Atrasadas",
+        this_week: "Esta semana",
+        today: "Hoje",
+        tomorrow: "Amanhã",
+        with_pending: "Com tarefas pendentes",
+      },
+      regarding_contact: "(Re: %{name})",
+      updated: "Tarefa atualizada",
+    },
+    tags: {
+      name: "Etiqueta |||| Etiquetas",
+      action: {
+        add: "Adicionar etiqueta",
+        create: "Criar nova etiqueta",
+      },
+      dialog: {
+        color: "Cor",
+        create_title: "Criar nova etiqueta",
+        edit_title: "Editar etiqueta",
+        name_label: "Nome da etiqueta",
+        name_placeholder: "Digite o nome da etiqueta",
+      },
+    },
+  },
+  crm: {
+    action: {
+      reset_password: "Redefinir Senha",
+    },
+    auth: {
+      first_name: "Nome",
+      last_name: "Sobrenome",
+      confirm_password: "Confirmar senha",
+      confirmation_required:
+        "Siga o link que enviamos por e-mail para confirmar sua conta.",
+      recovery_email_sent:
+        "Se você é um usuário cadastrado, receberá um e-mail de recuperação de senha em breve.",
+      sign_in_failed: "Falha ao entrar.",
+      sign_in_google_workspace: "Entrar com Google Workspace",
+      signup: {
+        create_account: "Criar conta",
+        create_first_user:
+          "Crie o primeiro usuário para concluir a configuração.",
+        creating: "Criando...",
+        initial_user_created: "Usuário inicial criado com sucesso",
+      },
+      welcome_title: "Bem-vindo ao Atomic CRM",
+    },
+    common: {
+      activity: "Atividade",
+      added: "adicionado",
+      details: "Detalhes",
+      last_activity_with_date: "última atividade %{date}",
+      load_more: "Carregar mais",
+      misc: "Outros",
+      past: "Passado",
+      read_more: "Ler mais",
+      retry: "Tentar novamente",
+      show_less: "Mostrar menos",
+      copied: "Copiado!",
+      copy: "Copiar",
+      loading: "Carregando...",
+      me: "Eu",
+      task_count: "%{smart_count} tarefa |||| %{smart_count} tarefas",
+    },
+    activity: {
+      added_company: "%{name} adicionou empresa",
+      you_added_company: "Você adicionou empresa",
+      added_contact: "%{name} adicionou",
+      you_added_contact: "Você adicionou",
+      added_note: "%{name} adicionou uma nota sobre",
+      you_added_note: "Você adicionou uma nota sobre",
+      added_note_about_deal: "%{name} adicionou uma nota sobre o negócio",
+      you_added_note_about_deal: "Você adicionou uma nota sobre o negócio",
+      added_deal: "%{name} adicionou negócio",
+      you_added_deal: "Você adicionou negócio",
+      at_company: "em",
+      to: "para",
+      load_more: "Carregar mais atividades",
+    },
+    dashboard: {
+      deals_chart: "Receita de Negócios Futuros",
+      deals_pipeline: "Pipeline de Negócios",
+      latest_activity: "Atividade Recente",
+      latest_activity_error: "Erro ao carregar atividade recente",
+      latest_notes: "Minhas Últimas Notas",
+      latest_notes_added_ago: "adicionado %{timeAgo}",
+      stepper: {
+        install: "Instalar Atomic CRM",
+        progress: "%{step}/3 concluídos",
+        whats_next: "O que vem a seguir?",
+      },
+      upcoming_tasks: "Próximas Tarefas",
+    },
+    header: {
+      import_data: "Importar dados",
+    },
+    image_editor: {
+      change: "Alterar",
+      drop_hint: "Solte um arquivo para enviar, ou clique para selecionar.",
+      editable_content: "Conteúdo editável",
+      title: "Enviar e redimensionar imagem",
+      update_image: "Atualizar Imagem",
+    },
+    import: {
+      action: {
+        download_error_report: "Baixar relatório de erros",
+        import: "Importar",
+        import_another: "Importar outro arquivo",
+      },
+      error: {
+        unable: "Não foi possível importar este arquivo.",
+      },
+      idle: {
+        description_1:
+          "Você pode importar usuários, empresas, contatos, notas e tarefas.",
+        description_2:
+          "Os dados devem estar em um arquivo JSON seguindo o modelo abaixo:",
+      },
+      status: {
+        all_success: "Todos os registros foram importados com sucesso.",
+        complete: "Importação concluída.",
+        failed: "Falhou",
+        imported: "Importado",
+        in_progress:
+          "Importação em andamento, não saia desta página.",
+        some_failed: "Alguns registros não foram importados.",
+        table_caption: "Status da importação",
+      },
+      title: "Importar Dados",
+    },
+    settings: {
+      companies: {
+        sectors: "Setores",
+      },
+      dark_mode_logo: "Logo Modo Escuro",
+      deals: {
+        categories: "Categorias",
+        currency: "Moeda",
+        pipeline_help:
+          "Selecione quais etapas devem ser contadas como negócios em pipeline.",
+        pipeline_statuses: "Etapas do Pipeline",
+        stages: "Etapas",
+      },
+      light_mode_logo: "Logo Modo Claro",
+      notes: {
+        statuses: "Status",
+      },
+      reset_defaults: "Restaurar Padrões",
+      save_error: "Falha ao salvar configuração",
+      saved: "Configuração salva com sucesso",
+      saving: "Salvando...",
+      tasks: {
+        types: "Tipos",
+      },
+      preferences: "Preferências",
+      title: "Configurações",
+      app_title: "Título do App",
+      sections: {
+        branding: "Identidade Visual",
+      },
+      validation: {
+        duplicate: "%{display_name} duplicado: %{items}",
+        in_use:
+          "Não é possível remover %{display_name} que ainda são usados em negócios: %{items}",
+        validating: "Validando\u2026",
+        entities: {
+          categories: "categorias",
+          stages: "etapas",
+        },
+      },
+    },
+    theme: {
+      dark: "Escuro",
+      label: "Tema",
+      light: "Claro",
+      system: "Sistema",
+    },
+    language: "Idioma",
+    navigation: {
+      label: "Navegação do CRM",
+    },
+    profile: {
+      inbound: {
+        description:
+          "Você pode enviar e-mails para o endereço de entrada do servidor, por ex. adicionando-o ao campo %{field}. O Atomic CRM processará os e-mails e adicionará notas aos contatos correspondentes.",
+        title: "E-mail de entrada",
+      },
+      mcp: {
+        title: "Servidor MCP",
+        description:
+          "Use esta URL para conectar seu assistente de IA aos dados do CRM via Model Context Protocol (MCP).",
+      },
+      password: {
+        change: "Alterar senha",
+      },
+      password_reset_sent:
+        "Um e-mail de redefinição de senha foi enviado para o seu endereço de e-mail",
+      record_not_found: "Registro não encontrado",
+      title: "Perfil",
+      updated: "Seu perfil foi atualizado",
+      update_error: "Ocorreu um erro. Tente novamente",
+    },
+    validation: {
+      invalid_url: "Deve ser uma URL válida",
+      invalid_linkedin_url: "A URL deve ser do linkedin.com",
+    },
+  },
+} satisfies CrmMessages;
