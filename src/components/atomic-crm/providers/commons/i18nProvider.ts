@@ -7,6 +7,7 @@ import { raSupabaseFrenchMessages } from "ra-supabase-language-french";
 import { englishCrmMessages } from "./englishCrmMessages";
 import { frenchCrmMessages } from "./frenchCrmMessages";
 import { portugueseBrazilianCrmMessages } from "./portugueseBrazilianCrmMessages";
+import { portugueseBrazilianFrameworkMessages } from "./portugueseBrazilianFrameworkMessages";
 
 const raSupabaseEnglishMessagesOverride = {
   "ra-supabase": {
@@ -42,6 +43,7 @@ const frenchCatalog = mergeTranslations(
 
 const portugueseBrazilianCatalog = mergeTranslations(
   englishCatalog,
+  portugueseBrazilianFrameworkMessages,
   portugueseBrazilianCrmMessages,
 );
 
