@@ -166,9 +166,9 @@ export const portugueseBrazilianCrmMessages = {
       },
       inputs: {
         genders: {
-          male: "Ele/Dele",
-          female: "Ela/Dela",
-          nonbinary: "Eles/Deles",
+          male: "Masculino",
+          female: "Feminino",
+          nonbinary: "Outros",
         },
         personal_info_types: {
           work: "Trabalho",

@@ -1,6 +1,30 @@
 import { Mars, NonBinary, Venus } from "lucide-react";
 
 import type { Company, Contact, ContactGender } from "../types";
+import {
+  validatePhone,
+  validateCPF,
+  validateCNPJ,
+  validateDate,
+} from "./utils/validations";
+
+/** Convert ISO date (YYYY-MM-DD) to display format (DD/MM/AAAA) */
+export const isoToDisplay = (
+  v: string | null | undefined,
+): string | null | undefined => {
+  if (!v) return v;
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : v;
+};
+
+/** Convert display date (DD/MM/AAAA) to ISO (YYYY-MM-DD) for PostgreSQL */
+const displayToIso = (
+  v: string | null | undefined,
+): string | null | undefined => {
+  if (!v) return v;
+  const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : v;
+};
 
 export const defaultEmailJsonb = [{ email: null, type: null }];
 export const defaultPhoneJsonb = [{ number: null, type: null }];
@@ -14,6 +38,9 @@ const cleanContactArrayFields = (data: Contact) => {
     ...data,
     phone_jsonb: cleanedPhoneJsonb.length > 0 ? cleanedPhoneJsonb : null,
     email_jsonb: cleanedEmailJsonb.length > 0 ? cleanedEmailJsonb : null,
+    // Convert DD/MM/AAAA → ISO for PostgreSQL date columns
+    date_of_birth: displayToIso(data.date_of_birth),
+    relationship_start_date: displayToIso(data.relationship_start_date),
   };
 };
 
@@ -28,12 +55,69 @@ export const cleanupContactForCreate = (data: Contact) => {
 
 export const cleanupContactForEdit = cleanContactArrayFields;
 
+/** Form-level validator: enforces required fields by contact status. */
+export const validateContactForm = (values: Contact) => {
+  const errors: Record<string, string> = {};
+  const isProspect = values.status === "prospect";
+
+  // Always required
+  if (!values.first_name?.trim()) errors.first_name = "ra.validation.required";
+  if (!values.last_name?.trim()) errors.last_name = "ra.validation.required";
+
+  const hasPhone = values.phone_jsonb?.some(
+    (p) => p.number && validatePhone(p.number),
+  );
+  const hasEmail = values.email_jsonb?.some(
+    (e) => e.email && /\S+@\S+\.\S+/.test(e.email),
+  );
+
+  if (isProspect) {
+    // Prospect: phone OR email (at least one)
+    if (!hasPhone && !hasEmail) {
+      errors.phone_jsonb =
+        "Para status Prospect: informe ao menos 1 telefone ou 1 e-mail válido.";
+    }
+  }
+
+  if (values.status && !isProspect) {
+    // Non-prospect (ativo, transferido, inativo, etc.)
+    if (!values.alias?.trim()) errors.alias = "ra.validation.required";
+    if (!hasPhone) errors.phone_jsonb = "Informe ao menos 1 telefone válido.";
+    if (!hasEmail) errors.email_jsonb = "Informe ao menos 1 e-mail válido.";
+
+    if (!values.person_type) {
+      errors.person_type = "ra.validation.required";
+    }
+
+    if (!values.document?.trim()) {
+      errors.document = "ra.validation.required";
+    } else if (values.person_type === "PJ") {
+      if (!validateCNPJ(values.document)) errors.document = "CNPJ inválido";
+    } else {
+      if (!validateCPF(values.document)) errors.document = "CPF inválido";
+    }
+
+    if (values.person_type !== "PJ") {
+      if (!values.date_of_birth?.trim()) {
+        errors.date_of_birth = "ra.validation.required";
+      } else if (!validateDate(values.date_of_birth)) {
+        errors.date_of_birth = "Data inválida (use DD/MM/AAAA)";
+      }
+    }
+
+    if (!values.xp_code?.trim()) errors.xp_code = "ra.validation.required";
+    if (!values.segment) errors.segment = "ra.validation.required";
+  }
+
+  return errors;
+};
+
 type TranslateFn = (key: string, options?: { [key: string]: any }) => string;
 
 export const contactGenderDefaultLabels: Record<string, string> = {
-  male: "He/Him",
-  female: "She/Her",
-  nonbinary: "They/Them",
+  male: "Male",
+  female: "Female",
+  nonbinary: "Other",
 };
 
 const personalInfoTypeMap: Record<string, string> = {

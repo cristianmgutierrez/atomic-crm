@@ -6,9 +6,9 @@ import {
   useTranslate,
   useUpdate,
 } from "ra-core";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ClipboardEventHandler, FocusEvent } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext, useFormState, useWatch } from "react-hook-form";
 import { Loader2, Search } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ import {
   cpfValidator,
   dateValidator,
   phoneValidator,
+  validatePhone,
 } from "./utils/validations";
 import { searchCEP } from "./utils/cep";
 
@@ -95,13 +96,83 @@ const CROSS_SELL_OPTIONS = [
   "Outro",
 ];
 
+// Fields belonging to each tab — used to auto-switch tab on validation error
+const TAB_FIELDS: Record<string, string[]> = {
+  personal: [
+    "first_name",
+    "last_name",
+    "alias",
+    "phone_jsonb",
+    "email_jsonb",
+    "person_type",
+    "document",
+    "date_of_birth",
+    "xp_code",
+    "monthly_income",
+    "gender",
+    "linkedin_url",
+    "website",
+    "has_newsletter",
+  ],
+  investor: [
+    "segment",
+    "investor_profile",
+    "declared_wealth",
+    "xp_account_type",
+    "xp_international",
+    "investment_horizon",
+    "financial_goal",
+    "relationship_start_date",
+    "xp_code_2",
+    "mb_code",
+    "avenue_code",
+    "sales_id",
+    "origin",
+    "referred_by",
+    "internal_notes",
+  ],
+};
+
+const getTabForField = (fieldName: string): string => {
+  for (const [tab, fields] of Object.entries(TAB_FIELDS)) {
+    if (fields.includes(fieldName)) return tab;
+  }
+  return "address";
+};
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export const ContactInputs = () => {
   const translate = useTranslate();
+  const [activeTab, setActiveTab] = useState("personal");
+  const { errors, isSubmitted, submitCount } = useFormState();
+  const prevSubmitCount = useRef(submitCount);
+
+  useEffect(() => {
+    if (submitCount === prevSubmitCount.current) return;
+    prevSubmitCount.current = submitCount;
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length === 0) return;
+
+    // Switch to the tab that contains the first error field
+    const firstErrorKey = errorKeys[0];
+    const targetTab = getTabForField(firstErrorKey);
+    setActiveTab(targetTab);
+
+    // After tab switch, scroll to and focus the first errored element
+    setTimeout(() => {
+      const el = document.querySelector(
+        `[name="${firstErrorKey}"]`,
+      ) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus();
+      }
+    }, 100);
+  }, [submitCount, errors, isSubmitted]);
 
   return (
-    <Tabs defaultValue="personal" className="w-full">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-4">
         <TabsTrigger value="personal">
           {translate("resources.contacts.field_categories.personal_info", {
@@ -258,7 +329,7 @@ const Tab1PersonalInfo = () => {
               className="w-full"
               helperText={false}
               label={false}
-              placeholder={translate("resources.contacts.fields.phone_number")}
+              placeholder="+55 11 98765-4321"
               validate={phoneValidator}
             />
             <SelectInput
@@ -310,6 +381,8 @@ const Tab1PersonalInfo = () => {
           </SimpleFormIterator>
         </ArrayInput>
       </div>
+
+      <ProspectContactAlert />
 
       {/* Tipo de Pessoa + Documento */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,6 +468,48 @@ const Tab1PersonalInfo = () => {
       {/* Newsletter */}
       <BooleanInput source="has_newsletter" helperText={false} />
     </div>
+  );
+};
+
+// ─── Contact Validation Alert ────────────────────────────────────────────────
+
+const ProspectContactAlert = () => {
+  const status = useWatch({ name: "status" });
+  const phoneJsonb = useWatch({ name: "phone_jsonb" });
+  const emailJsonb = useWatch({ name: "email_jsonb" });
+
+  if (!status) return null;
+
+  const isProspect = status === "prospect";
+
+  const hasValidPhone = phoneJsonb?.some(
+    (p: { number?: string }) => p.number && validatePhone(p.number),
+  );
+  const hasValidEmail = emailJsonb?.some(
+    (e: { email?: string }) => e.email && /\S+@\S+\.\S+/.test(e.email),
+  );
+
+  if (isProspect) {
+    if (hasValidPhone || hasValidEmail) return null;
+    return (
+      <p className="text-sm text-destructive rounded bg-destructive/10 px-3 py-2">
+        Para contatos com status <strong>Prospect</strong>, informe ao menos 1
+        telefone válido ou 1 e-mail válido.
+      </p>
+    );
+  }
+
+  // Non-prospect statuses require BOTH phone AND email
+  const missing: string[] = [];
+  if (!hasValidPhone) missing.push("1 telefone válido");
+  if (!hasValidEmail) missing.push("1 e-mail válido");
+
+  if (missing.length === 0) return null;
+
+  return (
+    <p className="text-sm text-destructive rounded bg-destructive/10 px-3 py-2">
+      Para este status, informe também: <strong>{missing.join(" e ")}</strong>.
+    </p>
   );
 };
 

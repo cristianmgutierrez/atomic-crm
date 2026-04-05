@@ -45,9 +45,14 @@ export const validateCNPJ = (cnpj: string): boolean => {
   return d1 === parseInt(digits[12]) && d2 === parseInt(digits[13]);
 };
 
-/** Validate Brazilian phone number */
+/** Validate phone number — local (10-11 digits) or international (+DDI, 10-15 digits total) */
 export const validatePhone = (phone: string): boolean => {
-  const digits = unmaskDigits(phone ?? "");
+  const trimmed = (phone ?? "").trim();
+  if (trimmed.startsWith("+")) {
+    const digits = trimmed.replace(/\D/g, "");
+    return digits.length >= 10 && digits.length <= 15;
+  }
+  const digits = unmaskDigits(trimmed);
   return digits.length >= 10 && digits.length <= 11;
 };
 

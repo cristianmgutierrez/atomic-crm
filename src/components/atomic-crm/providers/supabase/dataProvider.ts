@@ -411,6 +411,8 @@ const applyFullTextSearch = (columns: string[]) => (params: GetListParams) => {
 };
 
 const uploadToBucket = async (fi: RAFile) => {
+  const supabase = getSupabaseClient();
+
   if (!fi.src.startsWith("blob:") && !fi.src.startsWith("data:")) {
     // Sign URL check if path exists in the bucket
     if (fi.path) {

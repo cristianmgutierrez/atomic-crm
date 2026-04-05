@@ -6,19 +6,54 @@
 /** Remove all non-digit characters */
 export const unmaskDigits = (value: string): string => value.replace(/\D/g, "");
 
-/** Apply phone mask: (XX) XXXXX-XXXX or (XX) XXXX-XXXX */
+/**
+ * Apply phone mask with optional DDI support.
+ *
+ * International (starts with +): +DDI DDD NNNNN-NNNN
+ *   Examples: +55 11 98787-6532 | +1 212 555-1234
+ *   DDI heuristic: 1 digit for +1/+7, 2 digits for all others (E.164, max 15 digits).
+ *
+ * Local (no +): (XX) XXXXX-XXXX or (XX) XXXX-XXXX
+ */
 export const maskPhone = (value: string): string => {
-  const digits = unmaskDigits(value).slice(0, 11);
-  if (digits.length <= 10) {
-    // landline: (XX) XXXX-XXXX
-    return digits
-      .replace(/^(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{4})(\d)/, "$1-$2");
+  const trimmed = (value ?? "").trimStart();
+
+  if (trimmed.startsWith("+")) {
+    const digits = trimmed.replace(/\D/g, "").slice(0, 15);
+    if (!digits) return "+";
+
+    // 1-digit DDI for zone 1 (Americas) and zone 7 (Russia/Kazakhstan)
+    const ddiLen = digits[0] === "1" || digits[0] === "7" ? 1 : 2;
+    const ddi = digits.slice(0, ddiLen);
+    const rest = digits.slice(ddiLen);
+    if (!rest) return `+${ddi}`;
+
+    const ddd = rest.slice(0, 2);
+    const local = rest.slice(2).slice(0, 9);
+    if (!local) return `+${ddi} ${ddd}`;
+
+    const formattedLocal =
+      local.length <= 8
+        ? local.replace(/^(\d{4})(\d)/, "$1-$2")
+        : local.replace(/^(\d{5})(\d)/, "$1-$2");
+
+    return `+${ddi} ${ddd} ${formattedLocal}`;
   }
-  // mobile: (XX) XXXXX-XXXX
-  return digits
-    .replace(/^(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2");
+
+  // Sem '+': auto-prepend +55 (Brasil por padrão)
+  const digits = unmaskDigits(trimmed).slice(0, 11);
+  if (!digits) return "";
+
+  const ddd = digits.slice(0, 2);
+  const local = digits.slice(2).slice(0, 9);
+  if (!local) return `+55 ${ddd}`;
+
+  const formattedLocal =
+    local.length <= 8
+      ? local.replace(/^(\d{4})(\d)/, "$1-$2")
+      : local.replace(/^(\d{5})(\d)/, "$1-$2");
+
+  return `+55 ${ddd} ${formattedLocal}`;
 };
 
 /** Apply CPF mask: XXX.XXX.XXX-XX */
