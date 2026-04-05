@@ -109,6 +109,40 @@ export type Contact = {
   phone_jsonb: PhoneNumberAndType[];
   nb_tasks?: number;
   company_name?: string;
+  // Aba 1: Informações Pessoais
+  alias?: string | null;
+  person_type?: string | null;
+  document?: string | null;
+  date_of_birth?: string | null;
+  xp_code?: string | null;
+  monthly_income?: number | null;
+  website?: string | null;
+  // Aba 2: Perfil do Investidor
+  segment?: string | null;
+  investor_profile?: string | null;
+  declared_wealth?: number | null;
+  xp_account_type?: string | null;
+  xp_international?: boolean | null;
+  investment_horizon?: string | null;
+  financial_goal?: string | null;
+  relationship_start_date?: string | null;
+  xp_code_2?: string | null;
+  mb_code?: string | null;
+  avenue_code?: string | null;
+  origin?: string | null;
+  referred_by?: string | null;
+  cross_sell_opportunities?: string[] | null;
+  internal_notes?: string | null;
+  // Aba 3: Endereço
+  zip_code?: string | null;
+  address?: string | null;
+  address_number?: string | null;
+  address_complement?: string | null;
+  neighborhood?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  address_notes?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {

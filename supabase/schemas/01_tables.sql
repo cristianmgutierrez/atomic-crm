@@ -50,7 +50,41 @@ create table public.contacts (
     linkedin_url text,
     email_jsonb jsonb,
     phone_jsonb jsonb,
-    escritorio_id bigint
+    escritorio_id bigint,
+    -- Aba 1: Informações Pessoais
+    alias text,
+    person_type text,
+    document text,
+    date_of_birth date,
+    xp_code text,
+    monthly_income numeric,
+    website text,
+    -- Aba 2: Perfil do Investidor
+    segment text,
+    investor_profile text,
+    declared_wealth numeric,
+    xp_account_type text,
+    xp_international boolean,
+    investment_horizon text,
+    financial_goal text,
+    relationship_start_date date,
+    xp_code_2 text,
+    mb_code text,
+    avenue_code text,
+    origin text,
+    referred_by text,
+    cross_sell_opportunities text[],
+    internal_notes text,
+    -- Aba 3: Endereço
+    zip_code text,
+    address text,
+    address_number text,
+    address_complement text,
+    neighborhood text,
+    city text,
+    state text,
+    country text,
+    address_notes text
 );
 
 create table public.contact_notes (

@@ -4,7 +4,17 @@ import { ArrayField } from "@/components/admin/array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
 import { TextField } from "@/components/admin/text-field";
 import { EmailField } from "@/components/admin/email-field";
-import { Mail, Phone, Linkedin, Check } from "lucide-react";
+import {
+  Building,
+  Calendar,
+  Check,
+  CreditCard,
+  Globe,
+  Linkedin,
+  Mail,
+  Phone,
+  User,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import {
   contactGender,
@@ -21,6 +31,7 @@ export const ContactPersonalInfo = () => {
 
   return (
     <div>
+      {/* Emails */}
       <ArrayField source="email_jsonb">
         <SingleFieldList className="flex-col gap-y-0">
           <EmailRow />
@@ -33,6 +44,7 @@ export const ContactPersonalInfo = () => {
         </p>
       )}
 
+      {/* LinkedIn */}
       {record.linkedin_url && (
         <PersonalInfoRow
           icon={<Linkedin className="w-4 h-4 text-muted-foreground" />}
@@ -49,6 +61,25 @@ export const ContactPersonalInfo = () => {
           }
         />
       )}
+
+      {/* Website */}
+      {record.website && (
+        <PersonalInfoRow
+          icon={<Globe className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <a
+              className="underline hover:no-underline text-sm text-muted-foreground"
+              href={record.website}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {record.website}
+            </a>
+          }
+        />
+      )}
+
+      {/* Phones */}
       <ArrayField source="phone_jsonb">
         <SingleFieldList className="flex-col gap-y-0">
           <PersonalInfoRow
@@ -58,6 +89,8 @@ export const ContactPersonalInfo = () => {
           />
         </SingleFieldList>
       </ArrayField>
+
+      {/* Gender */}
       {contactGender
         .map((genderOption) => {
           if (record.gender === genderOption.value) {
@@ -78,6 +111,58 @@ export const ContactPersonalInfo = () => {
           return null;
         })
         .filter(Boolean)}
+
+      {/* Alias */}
+      {record.alias && (
+        <PersonalInfoRow
+          icon={<User className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <span className="text-sm text-muted-foreground">
+              {translate("resources.contacts.fields.alias", { _: "Apelido" })}:{" "}
+              {record.alias}
+            </span>
+          }
+        />
+      )}
+
+      {/* Document */}
+      {record.document && (
+        <PersonalInfoRow
+          icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <span className="text-sm text-muted-foreground">
+              {record.person_type ?? "Doc"}: {record.document}
+            </span>
+          }
+        />
+      )}
+
+      {/* Date of Birth */}
+      {record.date_of_birth && (
+        <PersonalInfoRow
+          icon={<Calendar className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <span className="text-sm text-muted-foreground">
+              {translate("resources.contacts.fields.date_of_birth", {
+                _: "Nascimento",
+              })}
+              : {record.date_of_birth}
+            </span>
+          }
+        />
+      )}
+
+      {/* XP Code */}
+      {record.xp_code && (
+        <PersonalInfoRow
+          icon={<Building className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <span className="text-sm text-muted-foreground">
+              XP: {record.xp_code}
+            </span>
+          }
+        />
+      )}
     </div>
   );
 };

@@ -152,7 +152,33 @@ export function exportToVCard(
 
   // LinkedIn URL
   if (contact.linkedin_url) {
-    lines.push(`URL:${contact.linkedin_url}`);
+    lines.push(`URL;TYPE=LINKEDIN:${contact.linkedin_url}`);
+  }
+
+  // Website
+  if (contact.website) {
+    lines.push(`URL;TYPE=WORK:${contact.website}`);
+  }
+
+  // Address
+  const hasAddress =
+    contact.address ||
+    contact.city ||
+    contact.state ||
+    contact.zip_code ||
+    contact.country;
+  if (hasAddress) {
+    // ADR format: PO Box;Extended;Street;City;State;Postal;Country
+    const street = [
+      contact.address,
+      contact.address_number,
+      contact.address_complement,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    lines.push(
+      `ADR;TYPE=HOME:;;${street};${contact.city ?? ""};${contact.state ?? ""};${contact.zip_code ?? ""};${contact.country ?? ""}`,
+    );
   }
 
   // Background/Note

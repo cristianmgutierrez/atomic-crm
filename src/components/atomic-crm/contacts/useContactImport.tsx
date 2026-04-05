@@ -23,6 +23,39 @@ export type ContactImportSchema = {
   status: string;
   tags: string;
   linkedin_url: string;
+  // Aba 1 — novos
+  alias?: string;
+  person_type?: string;
+  document?: string;
+  date_of_birth?: string;
+  xp_code?: string;
+  monthly_income?: string;
+  website?: string;
+  // Aba 2 — novos
+  segment?: string;
+  investor_profile?: string;
+  declared_wealth?: string;
+  xp_account_type?: string;
+  xp_international?: string;
+  investment_horizon?: string;
+  financial_goal?: string;
+  relationship_start_date?: string;
+  xp_code_2?: string;
+  mb_code?: string;
+  avenue_code?: string;
+  origin?: string;
+  referred_by?: string;
+  internal_notes?: string;
+  // Aba 3 — novos
+  zip_code?: string;
+  address?: string;
+  address_number?: string;
+  address_complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  address_notes?: string;
 };
 
 export function useContactImport() {
@@ -104,6 +137,36 @@ export function useContactImport() {
             company: companyName,
             tags: tagNames,
             linkedin_url,
+            alias,
+            person_type,
+            document,
+            date_of_birth,
+            xp_code,
+            monthly_income,
+            website,
+            segment,
+            investor_profile,
+            declared_wealth,
+            xp_account_type,
+            xp_international,
+            investment_horizon,
+            financial_goal,
+            relationship_start_date,
+            xp_code_2,
+            mb_code,
+            avenue_code,
+            origin,
+            referred_by,
+            internal_notes,
+            zip_code,
+            address,
+            address_number,
+            address_complement,
+            neighborhood,
+            city,
+            state,
+            country,
+            address_notes,
           }) => {
             const email_jsonb = [
               { email: email_work, type: "Work" },
@@ -143,6 +206,45 @@ export function useContactImport() {
                 tags: tagList.map((tag) => tag.id),
                 sales_id: user?.identity?.id,
                 linkedin_url,
+                alias: alias || null,
+                person_type: person_type || null,
+                document: document || null,
+                date_of_birth: date_of_birth || null,
+                xp_code: xp_code || null,
+                monthly_income: monthly_income
+                  ? parseFloat(monthly_income)
+                  : null,
+                website: website || null,
+                segment: segment || null,
+                investor_profile: investor_profile || null,
+                declared_wealth: declared_wealth
+                  ? parseFloat(declared_wealth)
+                  : null,
+                xp_account_type: xp_account_type || null,
+                xp_international:
+                  xp_international === "true"
+                    ? true
+                    : xp_international === "false"
+                      ? false
+                      : null,
+                investment_horizon: investment_horizon || null,
+                financial_goal: financial_goal || null,
+                relationship_start_date: relationship_start_date || null,
+                xp_code_2: xp_code_2 || null,
+                mb_code: mb_code || null,
+                avenue_code: avenue_code || null,
+                origin: origin || null,
+                referred_by: referred_by || null,
+                internal_notes: internal_notes || null,
+                zip_code: zip_code || null,
+                address: address || null,
+                address_number: address_number || null,
+                address_complement: address_complement || null,
+                neighborhood: neighborhood || null,
+                city: city || null,
+                state: state || null,
+                country: country || null,
+                address_notes: address_notes || null,
               },
             });
           },

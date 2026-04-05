@@ -417,7 +417,45 @@ BEGIN
     first_seen = LEAST(COALESCE(winner_contact.first_seen, loser_contact.first_seen), COALESCE(loser_contact.first_seen, winner_contact.first_seen)),
     last_seen = GREATEST(COALESCE(winner_contact.last_seen, loser_contact.last_seen), COALESCE(loser_contact.last_seen, winner_contact.last_seen)),
     sales_id = COALESCE(winner_contact.sales_id, loser_contact.sales_id),
-    tags = merged_tags
+    tags = merged_tags,
+    -- Aba 1: Informações Pessoais
+    alias = COALESCE(winner_contact.alias, loser_contact.alias),
+    person_type = COALESCE(winner_contact.person_type, loser_contact.person_type),
+    document = COALESCE(winner_contact.document, loser_contact.document),
+    date_of_birth = COALESCE(winner_contact.date_of_birth, loser_contact.date_of_birth),
+    xp_code = COALESCE(winner_contact.xp_code, loser_contact.xp_code),
+    monthly_income = COALESCE(winner_contact.monthly_income, loser_contact.monthly_income),
+    website = COALESCE(winner_contact.website, loser_contact.website),
+    -- Aba 2: Perfil do Investidor
+    segment = COALESCE(winner_contact.segment, loser_contact.segment),
+    investor_profile = COALESCE(winner_contact.investor_profile, loser_contact.investor_profile),
+    declared_wealth = COALESCE(winner_contact.declared_wealth, loser_contact.declared_wealth),
+    xp_account_type = COALESCE(winner_contact.xp_account_type, loser_contact.xp_account_type),
+    xp_international = COALESCE(winner_contact.xp_international, loser_contact.xp_international),
+    investment_horizon = COALESCE(winner_contact.investment_horizon, loser_contact.investment_horizon),
+    financial_goal = COALESCE(winner_contact.financial_goal, loser_contact.financial_goal),
+    relationship_start_date = COALESCE(winner_contact.relationship_start_date, loser_contact.relationship_start_date),
+    xp_code_2 = COALESCE(winner_contact.xp_code_2, loser_contact.xp_code_2),
+    mb_code = COALESCE(winner_contact.mb_code, loser_contact.mb_code),
+    avenue_code = COALESCE(winner_contact.avenue_code, loser_contact.avenue_code),
+    origin = COALESCE(winner_contact.origin, loser_contact.origin),
+    referred_by = COALESCE(winner_contact.referred_by, loser_contact.referred_by),
+    cross_sell_opportunities = CASE
+        WHEN winner_contact.cross_sell_opportunities IS NOT NULL AND loser_contact.cross_sell_opportunities IS NOT NULL
+        THEN ARRAY(SELECT DISTINCT unnest(winner_contact.cross_sell_opportunities || loser_contact.cross_sell_opportunities))
+        ELSE COALESCE(winner_contact.cross_sell_opportunities, loser_contact.cross_sell_opportunities)
+    END,
+    internal_notes = COALESCE(winner_contact.internal_notes, loser_contact.internal_notes),
+    -- Aba 3: Endereço
+    zip_code = COALESCE(winner_contact.zip_code, loser_contact.zip_code),
+    address = COALESCE(winner_contact.address, loser_contact.address),
+    address_number = COALESCE(winner_contact.address_number, loser_contact.address_number),
+    address_complement = COALESCE(winner_contact.address_complement, loser_contact.address_complement),
+    neighborhood = COALESCE(winner_contact.neighborhood, loser_contact.neighborhood),
+    city = COALESCE(winner_contact.city, loser_contact.city),
+    state = COALESCE(winner_contact.state, loser_contact.state),
+    country = COALESCE(winner_contact.country, loser_contact.country),
+    address_notes = COALESCE(winner_contact.address_notes, loser_contact.address_notes)
   WHERE id = winner_id;
 
   -- 6. Delete loser contact

@@ -41,10 +41,10 @@ export const defaultDealCategories = [
 ];
 
 export const defaultNoteStatuses = [
-  { value: "cold", label: "Cold", color: "#7dbde8" },
-  { value: "warm", label: "Warm", color: "#e8cb7d" },
-  { value: "hot", label: "Hot", color: "#e88b7d" },
-  { value: "in-contract", label: "In Contract", color: "#a4e87d" },
+  { value: "ativo", label: "Ativo", color: "#a4e87d" },
+  { value: "inativo", label: "Inativo", color: "#7dbde8" },
+  { value: "prospect", label: "Prospect", color: "#e8cb7d" },
+  { value: "transferido", label: "Transferido", color: "#e88b7d" },
 ];
 
 export const defaultTaskTypes = [

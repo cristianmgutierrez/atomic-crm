@@ -29,6 +29,9 @@ export const ContactCreate = ({
               sales_id: identity?.id,
               email_jsonb: defaultEmailJsonb,
               phone_jsonb: defaultPhoneJsonb,
+              country: "Brasil",
+              person_type: "PF",
+              cross_sell_opportunities: [],
             }}
           >
             <Card>
