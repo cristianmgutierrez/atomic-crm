@@ -18,7 +18,7 @@ export const isoToDisplay = (
 };
 
 /** Convert display date (DD/MM/AAAA) to ISO (YYYY-MM-DD) for PostgreSQL */
-const displayToIso = (
+export const displayToIso = (
   v: string | null | undefined,
 ): string | null | undefined => {
   if (!v) return v;

@@ -165,7 +165,7 @@ const DataTableHead = ({ children }: { children: ReactNode }) => {
     <TableHeader>
       <TableRow>
         {hasBulkActions ? (
-          <TableHead className="w-8">
+          <TableHead className="sticky left-0 z-20 bg-background w-8">
             <Checkbox
               onCheckedChange={handleToggleSelectAll}
               checked={
@@ -269,7 +269,10 @@ const DataTableRow = ({
       className={cn(rowClick !== false && "cursor-pointer", className)}
     >
       {hasBulkActions ? (
-        <TableCell className="flex w-8" onClick={handleToggle}>
+        <TableCell
+          className="sticky left-0 z-10 bg-background flex w-8"
+          onClick={handleToggle}
+        >
           <Checkbox
             checked={selectedIds?.includes(record.id)}
             onClick={handleToggle}
