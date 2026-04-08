@@ -12,6 +12,7 @@ import { SaveButton } from "@/components/admin/form";
 import { FormToolbar } from "@/components/admin/simple-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import type { Deal } from "../types";
 import { DealInputs } from "./DealInputs";
 
@@ -71,6 +72,7 @@ export const DealCreate = ({ open }: { open: boolean }) => {
   };
 
   const { identity } = useGetIdentity();
+  const { selectedPipeline } = useSelectedPipeline();
 
   return (
     <Dialog open={open} onOpenChange={() => handleClose()}>
@@ -81,6 +83,8 @@ export const DealCreate = ({ open }: { open: boolean }) => {
               sales_id: identity?.id,
               contact_ids: [],
               index: 0,
+              pipeline_id: selectedPipeline?.id,
+              stage: selectedPipeline?.stages?.[0]?.value,
             }}
           >
             <DealInputs />

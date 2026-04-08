@@ -6,6 +6,7 @@ import { memo, useMemo } from "react";
 
 import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import type { Deal } from "../types";
 
 const multiplier = {
@@ -23,7 +24,9 @@ const DEFAULT_LOCALE = "en-US";
 
 export const DealsChart = memo(() => {
   const translate = useTranslate();
-  const { dealStages, currency } = useConfigurationContext();
+  const { currency } = useConfigurationContext();
+  const { selectedPipeline } = useSelectedPipeline();
+  const dealStages = selectedPipeline?.stages ?? [];
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
     : [DEFAULT_LOCALE];
@@ -38,6 +41,7 @@ export const DealsChart = memo(() => {
     },
     filter: {
       "created_at@gte": threeMonthsAgo,
+      ...(selectedPipeline ? { pipeline_id: selectedPipeline.id } : {}),
     },
   });
   const months = useMemo(() => {

@@ -57,6 +57,10 @@ create or replace trigger set_tag_escritorio_id_trigger
     before insert on public.tags
     for each row execute function public.set_escritorio_id_default();
 
+create or replace trigger set_pipeline_escritorio_id_trigger
+    before insert on public.pipelines
+    for each row execute function public.set_escritorio_id_default();
+
 -- Auto-fetch company logo from website favicon on save
 create or replace trigger company_saved
     before insert or update on public.companies

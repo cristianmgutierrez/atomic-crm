@@ -44,8 +44,6 @@ import {
   defaultCurrency,
   defaultDarkModeLogo,
   defaultDealCategories,
-  defaultDealPipelineStatuses,
-  defaultDealStages,
   defaultLightModeLogo,
   defaultNoteStatuses,
   defaultTaskTypes,
@@ -83,8 +81,6 @@ export type CRMProps = {
  * @param {string} currency - The ISO 4217 currency code used to format monetary values (e.g. "USD", "EUR", "GBP").
  * @param {RaThemeOptions} darkTheme - The theme to use when the application is in dark mode.
  * @param {LabeledValue[]} dealCategories - The categories of deals used in the application.
- * @param {string[]} dealPipelineStatuses - The statuses of deals in the pipeline used in the application.
- * @param {DealStage[]} dealStages - The stages of deals used in the application.
  * @param {RaThemeOptions} lightTheme - The theme to use when the application is in light mode.
  * @param {string} logo - The logo used in the CRM application.
  * @param {NoteStatus[]} noteStatuses - The statuses of notes used in the application.
@@ -116,8 +112,6 @@ export const CRM = ({
   companySectors = defaultCompanySectors,
   currency = defaultCurrency,
   dealCategories = defaultDealCategories,
-  dealPipelineStatuses = defaultDealPipelineStatuses,
-  dealStages = defaultDealStages,
   darkModeLogo = defaultDarkModeLogo,
   lightModeLogo = defaultLightModeLogo,
   noteStatuses = defaultNoteStatuses,
@@ -155,8 +149,6 @@ export const CRM = ({
         companySectors,
         currency,
         dealCategories,
-        dealPipelineStatuses,
-        dealStages,
         noteStatuses,
         taskTypes,
         title,
@@ -272,6 +264,7 @@ const DesktopAdmin = (
       <Resource name="tasks" />
       <Resource name="sales" {...sales} />
       <Resource name="tags" />
+      <Resource name="pipelines" />
       <Resource name="escritorios" {...escritorios} />
     </Admin>
   );

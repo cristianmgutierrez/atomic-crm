@@ -201,6 +201,7 @@ export const englishCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Expected closing date",
         stage: "Stage",
+        pipeline_id: "Pipeline",
       },
       action: {
         back_to_deal: "Back to deal",
@@ -498,6 +499,25 @@ export const englishCrmMessages = {
       app_title: "App Title",
       sections: {
         branding: "Branding",
+        pipelines: "Pipelines",
+      },
+      pipelines: {
+        add: "Add Pipeline",
+        name: "Pipeline Name",
+        stages: "Stages",
+        pipeline_statuses: "Pipeline Statuses",
+        pipeline_help:
+          "Select which stages should be counted as pipeline deals.",
+        add_stage: "Add stage",
+        save: "Save Pipeline",
+        delete: "Delete Pipeline",
+        delete_confirm:
+          "Are you sure you want to delete this pipeline? This action cannot be undone.",
+        cannot_delete_has_deals:
+          "Cannot delete a pipeline that has deals associated with it.",
+        cannot_delete_stage_has_deals:
+          "Cannot remove stages that have deals associated: %{items}",
+        empty: "No pipelines found.",
       },
       validation: {
         duplicate: "Duplicate %{display_name}: %{items}",

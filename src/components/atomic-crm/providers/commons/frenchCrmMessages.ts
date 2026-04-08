@@ -206,6 +206,7 @@ export const frenchCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Date de clôture prévue",
         stage: "Étape",
+        pipeline_id: "Pipeline",
       },
       action: {
         back_to_deal: "Retour à l'affaire",
@@ -505,6 +506,25 @@ export const frenchCrmMessages = {
       app_title: "Titre de l'application",
       sections: {
         branding: "Image de marque",
+        pipelines: "Pipelines",
+      },
+      pipelines: {
+        add: "Ajouter un pipeline",
+        name: "Nom du pipeline",
+        stages: "Étapes",
+        pipeline_statuses: "Statuts du pipeline",
+        pipeline_help:
+          "Sélectionnez les étapes qui doivent être comptées comme des affaires en pipeline.",
+        add_stage: "Ajouter une étape",
+        save: "Enregistrer le pipeline",
+        delete: "Supprimer le pipeline",
+        delete_confirm:
+          "Êtes-vous sûr de vouloir supprimer ce pipeline ? Cette action est irréversible.",
+        cannot_delete_has_deals:
+          "Impossible de supprimer un pipeline qui a des affaires associées.",
+        cannot_delete_stage_has_deals:
+          "Impossible de supprimer les étapes associées à des affaires : %{items}",
+        empty: "Aucun pipeline trouvé.",
       },
       validation: {
         duplicate: "%{display_name} en double : %{items}",

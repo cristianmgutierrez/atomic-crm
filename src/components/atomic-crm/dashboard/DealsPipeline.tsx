@@ -8,6 +8,7 @@ import { SimpleList } from "../simple-list/SimpleList";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import type { Deal } from "../types";
 
 /**
@@ -17,14 +18,20 @@ import type { Deal } from "../types";
 export const DealsPipeline = () => {
   const translate = useTranslate();
   const { identity } = useGetIdentity();
-  const { dealStages, dealPipelineStatuses, currency } =
-    useConfigurationContext();
+  const { currency } = useConfigurationContext();
+  const { selectedPipeline } = useSelectedPipeline();
+  const dealStages = selectedPipeline?.stages ?? [];
+  const dealPipelineStatuses = selectedPipeline?.pipeline_statuses ?? [];
   const { data, total, isPending } = useGetList<Deal>(
     "deals",
     {
       pagination: { page: 1, perPage: 10 },
       sort: { field: "last_seen", order: "DESC" },
-      filter: { "stage@neq": "lost", sales_id: identity?.id },
+      filter: {
+        "stage@neq": "lost",
+        sales_id: identity?.id,
+        ...(selectedPipeline ? { pipeline_id: selectedPipeline.id } : {}),
+      },
     },
     { enabled: Number.isInteger(identity?.id) },
   );
@@ -72,7 +79,7 @@ export const DealsPipeline = () => {
               currency,
               currencyDisplay: "narrowSymbol",
               minimumSignificantDigits: 3,
-            })} , ${findDealLabel(dealStages, deal.stage)}`
+            })}, ${findDealLabel(dealStages, deal.stage)}`
           }
           leftAvatar={(deal) => (
             <ReferenceField

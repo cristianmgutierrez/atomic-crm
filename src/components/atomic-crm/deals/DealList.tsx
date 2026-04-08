@@ -12,6 +12,7 @@ import { SearchInput } from "@/components/admin/search-input";
 import { SelectInput } from "@/components/admin/select-input";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import { TopToolbar } from "../layout/TopToolbar";
 import { DealArchivedList } from "./DealArchivedList";
 import { DealCreate } from "./DealCreate";
@@ -20,10 +21,12 @@ import { DealEmpty } from "./DealEmpty";
 import { DealListContent } from "./DealListContent";
 import { DealShow } from "./DealShow";
 import { OnlyMineInput } from "./OnlyMineInput";
+import { PipelineSelector } from "./PipelineSelector";
 
 const DealList = () => {
   const { identity } = useGetIdentity();
   const { dealCategories } = useConfigurationContext();
+  const { selectedPipeline } = useSelectedPipeline();
   const translate = useTranslate();
 
   if (!identity) return null;
@@ -49,10 +52,14 @@ const DealList = () => {
     <OnlyMineInput source="sales_id" alwaysOn />,
   ];
 
+  const pipelineFilter = selectedPipeline
+    ? { pipeline_id: selectedPipeline.id }
+    : {};
+
   return (
     <List
       perPage={100}
-      filter={{ "archived_at@is": null }}
+      filter={{ "archived_at@is": null, ...pipelineFilter }}
       title={false}
       sort={{ field: "index", order: "DESC" }}
       filters={dealFilters}
@@ -97,6 +104,7 @@ const DealLayout = () => {
 
 const DealActions = () => (
   <TopToolbar>
+    <PipelineSelector />
     <FilterButton />
     <ExportButton />
     <CreateButton label="resources.deals.action.new" />

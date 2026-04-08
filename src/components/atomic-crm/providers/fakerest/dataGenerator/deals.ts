@@ -1,10 +1,7 @@
 import { add } from "date-fns";
 import { datatype, lorem, random } from "faker/locale/en_US";
 
-import {
-  defaultDealCategories,
-  defaultDealStages,
-} from "../../../root/defaultConfiguration";
+import { defaultDealCategories } from "../../../root/defaultConfiguration";
 import type { Deal } from "../../../types";
 import type { Db } from "./types";
 import { randomDate } from "./utils";
@@ -27,13 +24,18 @@ export const generateDeals = (db: Db): Deal[] => {
       .toISOString()
       .split("T")[0];
 
+    // Pick a random pipeline and a stage from that pipeline
+    const pipeline = random.arrayElement(db.pipelines);
+    const stage = random.arrayElement(pipeline.stages).value;
+
     return {
       id,
       name: lowercaseName[0].toUpperCase() + lowercaseName.slice(1),
       company_id: company.id,
       contact_ids: contacts.map((contact) => contact.id),
       category: random.arrayElement(defaultDealCategories).value,
-      stage: random.arrayElement(defaultDealStages).value,
+      stage,
+      pipeline_id: pipeline.id,
       description: lorem.paragraphs(datatype.number({ min: 1, max: 4 })),
       amount: datatype.number(1000) * 100,
       created_at,
@@ -43,13 +45,20 @@ export const generateDeals = (db: Db): Deal[] => {
       index: 0,
     };
   });
-  // compute index based on stage
-  defaultDealStages.forEach((stage) => {
-    deals
-      .filter((deal) => deal.stage === stage.value)
-      .forEach((deal, index) => {
-        deals[deal.id].index = index;
-      });
+
+  // Compute index per pipeline+stage
+  db.pipelines.forEach((pipeline) => {
+    pipeline.stages.forEach((stage) => {
+      deals
+        .filter(
+          (deal) =>
+            deal.pipeline_id === pipeline.id && deal.stage === stage.value,
+        )
+        .forEach((deal, index) => {
+          deals[deal.id].index = index;
+        });
+    });
   });
+
   return deals;
 };

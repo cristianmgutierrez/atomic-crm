@@ -32,6 +32,7 @@ import { MobileBackButton } from "../misc/MobileBackButton";
 import { formatRelativeDate } from "../misc/RelativeDate";
 import { Status } from "../misc/Status";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { usePipelines } from "../pipelines/usePipelines";
 import type { Company, Contact, Deal } from "../types";
 import {
   AdditionalInfo,
@@ -262,7 +263,8 @@ const DealsIterator = () => {
   const translate = useTranslate();
   const [locale = "en"] = useLocaleState();
   const { data: deals, error, isPending } = useListContext<Deal>();
-  const { dealStages, dealCategories, currency } = useConfigurationContext();
+  const { dealCategories, currency } = useConfigurationContext();
+  const { pipelines } = usePipelines();
   if (isPending || error) return null;
   return (
     <div>
@@ -276,7 +278,12 @@ const DealsIterator = () => {
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{deal.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  {findDealLabel(dealStages, deal.stage)},{" "}
+                  {findDealLabel(
+                    pipelines.find((p) => p.id === deal.pipeline_id)?.stages ??
+                      [],
+                    deal.stage,
+                  )}
+                  ,{" "}
                   {deal.amount.toLocaleString("en-US", {
                     notation: "compact",
                     style: "currency",

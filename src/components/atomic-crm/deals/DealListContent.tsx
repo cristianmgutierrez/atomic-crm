@@ -3,14 +3,15 @@ import isEqual from "lodash/isEqual";
 import { useDataProvider, useListContext, type DataProvider } from "ra-core";
 import { useEffect, useState } from "react";
 
-import { useConfigurationContext } from "../root/ConfigurationContext";
-import type { Deal } from "../types";
+import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
+import type { Deal, DealStage } from "../types";
 import { DealColumn } from "./DealColumn";
 import type { DealsByStage } from "./stages";
 import { getDealsByStage } from "./stages";
 
 export const DealListContent = () => {
-  const { dealStages } = useConfigurationContext();
+  const { selectedPipeline } = useSelectedPipeline();
+  const dealStages: DealStage[] = selectedPipeline?.stages ?? [];
   const { data: unorderedDeals, isPending, refetch } = useListContext<Deal>();
   const dataProvider = useDataProvider();
 
@@ -26,7 +27,7 @@ export const DealListContent = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unorderedDeals]);
+  }, [unorderedDeals, selectedPipeline?.id]);
 
   if (isPending) return null;
 
@@ -76,7 +77,8 @@ export const DealListContent = () => {
         {dealStages.map((stage) => (
           <DealColumn
             stage={stage.value}
-            deals={dealsByStage[stage.value]}
+            deals={dealsByStage[stage.value] ?? []}
+            dealStages={dealStages}
             key={stage.value}
           />
         ))}

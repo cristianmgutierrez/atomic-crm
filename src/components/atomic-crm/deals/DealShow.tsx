@@ -25,6 +25,7 @@ import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate } from "../notes/NoteCreate";
 import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { usePipelines } from "../pipelines/usePipelines";
 import type { Deal } from "../types";
 import { ContactList } from "./ContactList";
 import { findDealLabel, formatISODateString } from "./dealUtils";
@@ -50,9 +51,13 @@ export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
 
 const DealShowContent = () => {
   const translate = useTranslate();
-  const { dealStages, dealCategories, currency } = useConfigurationContext();
+  const { dealCategories, currency } = useConfigurationContext();
+  const { pipelines } = usePipelines();
   const record = useRecordContext<Deal>();
   if (!record) return null;
+
+  const dealPipeline = pipelines.find((p) => p.id === record.pipeline_id);
+  const dealStages = dealPipeline?.stages ?? [];
 
   return (
     <>

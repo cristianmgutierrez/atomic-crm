@@ -239,7 +239,10 @@ const getDataProviderWithCustomMethods = () => {
       const { data } = await baseDataProvider.getOne("configuration", {
         id: 1,
       });
-      return (data?.config as ConfigurationContextValue) ?? {};
+      const config = (data?.config as Record<string, unknown>) ?? {};
+      // Backward compat: strip legacy fields moved to pipelines table
+      const { dealStages: _, dealPipelineStatuses: __, ...rest } = config;
+      return rest as ConfigurationContextValue;
     },
     async updateConfiguration(
       config: ConfigurationContextValue,

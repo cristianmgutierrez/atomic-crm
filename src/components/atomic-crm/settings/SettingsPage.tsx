@@ -27,6 +27,7 @@ import {
   type ConfigurationContextValue,
 } from "../root/ConfigurationContext";
 import { defaultConfiguration } from "../root/defaultConfiguration";
+import { PipelinesSettings } from "./PipelinesSettings";
 
 const SECTIONS = [
   {
@@ -40,6 +41,11 @@ const SECTIONS = [
     fallback: "Companies",
   },
   { id: "deals", label: "resources.deals.name", fallback: "Deals" },
+  {
+    id: "pipelines",
+    label: "crm.settings.sections.pipelines",
+    fallback: "Funis",
+  },
   { id: "notes", label: "resources.notes.name", fallback: "Notes" },
   { id: "tasks", label: "resources.tasks.name", fallback: "Tasks" },
 ];
@@ -125,8 +131,6 @@ const transformFormValues = (data: Record<string, any>) => ({
     companySectors: ensureValues(data.companySectors),
     dealCategories: ensureValues(data.dealCategories),
     taskTypes: ensureValues(data.taskTypes),
-    dealStages: ensureValues(data.dealStages),
-    dealPipelineStatuses: data.dealPipelineStatuses,
     noteStatuses: ensureValues(data.noteStatuses),
   } as ConfigurationContextValue,
 });
@@ -173,8 +177,6 @@ const SettingsForm = () => {
       companySectors: config.companySectors,
       dealCategories: config.dealCategories,
       taskTypes: config.taskTypes,
-      dealStages: config.dealStages,
-      dealPipelineStatuses: config.dealPipelineStatuses,
       noteStatuses: config.noteStatuses,
     }),
     [config],
@@ -191,15 +193,10 @@ const SettingsFormFields = () => {
   const translate = useTranslate();
   const currencyChoices = useMemo(() => getCurrencyChoices(), []);
   const {
-    watch,
-    setValue,
     reset,
     formState: { isSubmitting },
   } = useFormContext();
 
-  const dealStages = watch("dealStages");
-  const dealPipelineStatuses: string[] = watch("dealPipelineStatuses") ?? [];
-  const stageDisplayName = translate("crm.settings.validation.entities.stages");
   const categoryDisplayName = translate(
     "crm.settings.validation.entities.categories",
   );
@@ -207,24 +204,6 @@ const SettingsFormFields = () => {
   const { data: deals } = useGetList("deals", {
     pagination: { page: 1, perPage: 1000 },
   });
-
-  const validateDealStages = useCallback(
-    (stages: { value: string; label: string }[] | undefined) =>
-      validateItemsInUse(stages, deals, "stage", stageDisplayName, {
-        duplicate: (displayName, duplicates) =>
-          translate("crm.settings.validation.duplicate", {
-            display_name: displayName,
-            items: duplicates.join(", "),
-          }),
-        inUse: (displayName, inUse) =>
-          translate("crm.settings.validation.in_use", {
-            display_name: displayName,
-            items: inUse.join(", "),
-          }),
-        validating: translate("crm.settings.validation.validating"),
-      }),
-    [deals, stageDisplayName, translate],
-  );
 
   const validateDealCategories = useCallback(
     (categories: { value: string; label: string }[] | undefined) =>
@@ -352,63 +331,6 @@ const SettingsFormFields = () => {
             <Separator />
 
             <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.stages")}
-            </h3>
-            <ArrayInput
-              source="dealStages"
-              label={false}
-              helperText={false}
-              validate={validateDealStages}
-            >
-              <SimpleFormIterator disableClear>
-                <TextInput source="label" label={false} />
-              </SimpleFormIterator>
-            </ArrayInput>
-
-            <Separator />
-
-            <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.pipeline_statuses")}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {translate("crm.settings.deals.pipeline_help")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {dealStages?.map(
-                (stage: { value: string; label: string }, idx: number) => {
-                  const isSelected = dealPipelineStatuses.includes(stage.value);
-                  return (
-                    <Button
-                      key={idx}
-                      type="button"
-                      variant={isSelected ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (isSelected) {
-                          setValue(
-                            "dealPipelineStatuses",
-                            dealPipelineStatuses.filter(
-                              (s) => s !== stage.value,
-                            ),
-                          );
-                        } else {
-                          setValue("dealPipelineStatuses", [
-                            ...dealPipelineStatuses,
-                            stage.value,
-                          ]);
-                        }
-                      }}
-                    >
-                      {stage.label || stage.value}
-                    </Button>
-                  );
-                },
-              )}
-            </div>
-
-            <Separator />
-
-            <h3 className="text-lg font-medium text-muted-foreground">
               {translate("crm.settings.deals.categories")}
             </h3>
             <ArrayInput
@@ -423,6 +345,9 @@ const SettingsFormFields = () => {
             </ArrayInput>
           </CardContent>
         </Card>
+
+        {/* Pipelines — managed separately (own CRUD resource) */}
+        <PipelinesSettings />
 
         {/* Notes */}
         <Card id="notes">

@@ -63,8 +63,6 @@ export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
   dealCategories: defaultDealCategories,
-  dealPipelineStatuses: defaultDealPipelineStatuses,
-  dealStages: defaultDealStages,
   noteStatuses: defaultNoteStatuses,
   taskTypes: defaultTaskTypes,
   title: defaultTitle,

@@ -154,12 +154,22 @@ export type ContactNote = {
   attachments?: AttachmentNote[];
 } & Pick<RaRecord, "id">;
 
+export type Pipeline = {
+  name: string;
+  stages: DealStage[];
+  pipeline_statuses: string[];
+  position: number;
+  created_at: string;
+  escritorio_id?: Identifier;
+} & Pick<RaRecord, "id">;
+
 export type Deal = {
   name: string;
   company_id: Identifier;
   contact_ids: Identifier[];
   category: string;
   stage: string;
+  pipeline_id: Identifier;
   description: string;
   amount: number;
   created_at: string;

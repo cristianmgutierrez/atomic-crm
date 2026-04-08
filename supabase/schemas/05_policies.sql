@@ -12,6 +12,7 @@ alter table public.deals enable row level security;
 alter table public.deal_notes enable row level security;
 alter table public.sales enable row level security;
 alter table public.tags enable row level security;
+alter table public.pipelines enable row level security;
 alter table public.tasks enable row level security;
 alter table public.configuration enable row level security;
 alter table public.favicons_excluded_domains enable row level security;
@@ -144,6 +145,27 @@ create policy "Deal notes delete" on public.deal_notes for delete to authenticat
 
 -- Sales (leitura permissiva para todos autenticados; escrita via edge function users com service role)
 create policy "Enable read access for authenticated users" on public.sales for select to authenticated using (true);
+
+-- Pipelines (compartilhados por escritório; todos os papéis podem gerenciar os funis do próprio escritório)
+create policy "Pipelines select" on public.pipelines for select to authenticated using (
+    public.is_admin()
+    or escritorio_id = public.get_my_escritorio_id()
+);
+create policy "Pipelines insert" on public.pipelines for insert to authenticated with check (
+    public.is_admin()
+    or escritorio_id = public.get_my_escritorio_id()
+);
+create policy "Pipelines update" on public.pipelines for update to authenticated using (
+    public.is_admin()
+    or escritorio_id = public.get_my_escritorio_id()
+) with check (
+    public.is_admin()
+    or escritorio_id = public.get_my_escritorio_id()
+);
+create policy "Pipelines delete" on public.pipelines for delete to authenticated using (
+    public.is_admin()
+    or escritorio_id = public.get_my_escritorio_id()
+);
 
 -- Tags (compartilhadas por escritório; todos os papéis podem gerenciar as tags do próprio escritório)
 create policy "Tags select" on public.tags for select to authenticated using (

@@ -239,6 +239,7 @@ export const portugueseBrazilianCrmMessages = {
         amount: "Valor",
         expected_closing_date: "Previsão de fechamento",
         stage: "Etapa",
+        pipeline_id: "Funil",
       },
       action: {
         back_to_deal: "Voltar ao negócio",
@@ -535,6 +536,25 @@ export const portugueseBrazilianCrmMessages = {
       app_title: "Título do App",
       sections: {
         branding: "Identidade Visual",
+        pipelines: "Funis",
+      },
+      pipelines: {
+        add: "Adicionar Funil",
+        name: "Nome do Funil",
+        stages: "Etapas",
+        pipeline_statuses: "Etapas do Pipeline",
+        pipeline_help:
+          "Selecione quais etapas devem ser contadas como negócios em pipeline.",
+        add_stage: "Adicionar etapa",
+        save: "Salvar Funil",
+        delete: "Excluir Funil",
+        delete_confirm:
+          "Tem certeza que deseja excluir este funil? Esta ação não pode ser desfeita.",
+        cannot_delete_has_deals:
+          "Não é possível excluir um funil que possui negócios vinculados.",
+        cannot_delete_stage_has_deals:
+          "Não é possível remover etapas que possuem negócios vinculados: %{items}",
+        empty: "Nenhum funil cadastrado.",
       },
       validation: {
         duplicate: "%{display_name} duplicado: %{items}",
