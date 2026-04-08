@@ -38,9 +38,11 @@ import type { Sale, SalesFormData } from "../types";
 export const ProfilePage = () => {
   const [isEditMode, setEditMode] = useState(false);
   const { identity, refetch: refetchIdentity } = useGetIdentity();
-  const { data, refetch: refetchUser } = useGetOne("sales", {
-    id: identity?.id,
-  });
+  const { data, refetch: refetchUser } = useGetOne(
+    "sales",
+    { id: identity?.id! },
+    { enabled: identity != null },
+  );
   const translate = useTranslate();
   const notify = useNotify();
   const dataProvider = useDataProvider<CrmDataProvider>();
@@ -77,7 +79,12 @@ export const ProfilePage = () => {
     },
   });
 
-  if (!identity) return null;
+  if (!identity)
+    return (
+      <div className="max-w-lg mx-auto mt-8 flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
 
   const handleOnSubmit = async (values: any) => {
     mutate(values);

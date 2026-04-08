@@ -13,10 +13,22 @@ const getBaseAuthProvider = () =>
         throw new Error();
       }
 
+      let avatarSrc = sale.avatar?.src;
+
+      // If sale came from cache (no avatar field), fetch avatar from DB
+      if (!avatarSrc && sale.id) {
+        const { data } = await getSupabaseClient()
+          .from("sales")
+          .select("avatar")
+          .eq("id", sale.id)
+          .single();
+        avatarSrc = data?.avatar?.src;
+      }
+
       return {
         id: sale.id,
         fullName: `${sale.first_name} ${sale.last_name}`,
-        avatar: sale.avatar?.src,
+        avatar: avatarSrc,
       };
     },
   });
@@ -78,7 +90,18 @@ const getSale = async () => {
     return undefined;
   }
 
-  storage?.setItem(CURRENT_SALE_CACHE_KEY, JSON.stringify(dataSale));
+  // Cache only lightweight fields (avatar can be very large base64)
+  try {
+    const cacheData = {
+      id: dataSale.id,
+      first_name: dataSale.first_name,
+      last_name: dataSale.last_name,
+      administrator: dataSale.administrator,
+    };
+    storage?.setItem(CURRENT_SALE_CACHE_KEY, JSON.stringify(cacheData));
+  } catch {
+    // Ignore QuotaExceededError — cache is optional
+  }
   return dataSale;
 };
 

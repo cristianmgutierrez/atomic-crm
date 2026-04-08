@@ -25,7 +25,8 @@ const DEFAULT_LOCALE = "en-US";
 export const DealsChart = memo(() => {
   const translate = useTranslate();
   const { currency } = useConfigurationContext();
-  const { selectedPipeline } = useSelectedPipeline();
+  const { selectedPipeline, isPending: isPipelinePending } =
+    useSelectedPipeline();
   const dealStages = selectedPipeline?.stages ?? [];
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
@@ -33,17 +34,21 @@ export const DealsChart = memo(() => {
   const wonLabel = findDealLabel(dealStages, "won") ?? "Won";
   const lostLabel = findDealLabel(dealStages, "lost") ?? "Lost";
 
-  const { data, isPending } = useGetList<Deal>("deals", {
-    pagination: { perPage: 100, page: 1 },
-    sort: {
-      field: "created_at",
-      order: "ASC",
+  const { data, isPending } = useGetList<Deal>(
+    "deals",
+    {
+      pagination: { perPage: 100, page: 1 },
+      sort: {
+        field: "created_at",
+        order: "ASC",
+      },
+      filter: {
+        "created_at@gte": threeMonthsAgo,
+        ...(selectedPipeline ? { pipeline_id: selectedPipeline.id } : {}),
+      },
     },
-    filter: {
-      "created_at@gte": threeMonthsAgo,
-      ...(selectedPipeline ? { pipeline_id: selectedPipeline.id } : {}),
-    },
-  });
+    { queryOptions: { enabled: !isPipelinePending } },
+  );
   const months = useMemo(() => {
     if (!data) return [];
     const dealsByMonth = data.reduce((acc, deal) => {
@@ -83,7 +88,7 @@ export const DealsChart = memo(() => {
     return amountByMonth;
   }, [data]);
 
-  if (isPending) return null; // FIXME return skeleton instead
+  if (isPipelinePending || isPending) return null; // FIXME return skeleton instead
   const range = months.reduce(
     (acc, month) => {
       acc.min = Math.min(acc.min, month.lost);
