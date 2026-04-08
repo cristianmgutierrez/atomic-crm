@@ -104,7 +104,10 @@ const ImageEditorDialog = (props: ImageEditorDialogProps) => {
 
   const updateImage = () => {
     const cropper = cropperRef.current?.cropper;
-    const croppedImage = cropper?.getCroppedCanvas().toDataURL();
+    const maxSize = props.type === "avatar" ? 200 : 800;
+    const croppedImage = cropper
+      ?.getCroppedCanvas({ maxWidth: maxSize, maxHeight: maxSize })
+      .toDataURL("image/jpeg", 0.85);
     if (croppedImage) {
       setImageSrc(croppedImage);
 
