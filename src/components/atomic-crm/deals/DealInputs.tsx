@@ -57,6 +57,7 @@ const DealLinkedToInputs = () => {
           label="resources.deals.fields.contact_ids"
           optionText={contactOptionText}
           helperText={false}
+          validate={required()}
         />
       </ReferenceArrayInput>
     </div>
