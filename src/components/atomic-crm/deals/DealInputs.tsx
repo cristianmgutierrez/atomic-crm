@@ -1,12 +1,12 @@
-import { required, useTranslate } from "ra-core";
-import { useEffect } from "react";
+import { required } from "ra-core";
+import { useEffect, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { AutocompleteArrayInput } from "@/components/admin/autocomplete-array-input";
 import { ReferenceArrayInput } from "@/components/admin/reference-array-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
 import { NumberInput } from "@/components/admin/number-input";
-import { DateInput } from "@/components/admin/date-input";
+import { DatePickerInput } from "@/components/admin/date-picker-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,19 +41,10 @@ const DealInfoInputs = () => {
 };
 
 const DealLinkedToInputs = () => {
-  const translate = useTranslate();
+  const { dealCategories } = useConfigurationContext();
   return (
     <div className="flex flex-col gap-4 flex-1">
-      <h3 className="text-base font-medium">
-        {translate("resources.deals.inputs.linked_to")}
-      </h3>
-      <ReferenceInput source="company_id" reference="companies">
-        <AutocompleteCompanyInput
-          label="resources.deals.fields.company_id"
-          validate={required()}
-          modal
-        />
-      </ReferenceInput>
+      <h3 className="text-base font-medium">Pessoa</h3>
 
       <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
         <AutocompleteArrayInput
@@ -63,32 +54,50 @@ const DealLinkedToInputs = () => {
           validate={required()}
         />
       </ReferenceArrayInput>
+
+      <ReferenceInput source="company_id" reference="companies">
+        <AutocompleteCompanyInput
+          label="resources.deals.fields.company_id"
+          validate={required()}
+          modal
+        />
+      </ReferenceInput>
+
+      <SelectInput
+        source="category"
+        choices={dealCategories}
+        optionText="label"
+        optionValue="value"
+        helperText={false}
+        validate={required()}
+      />
     </div>
   );
 };
 
 const DealMiscInputs = () => {
-  const { dealCategories } = useConfigurationContext();
   const { pipelines } = usePipelines();
-  const translate = useTranslate();
   const { setValue } = useFormContext();
 
   const selectedPipelineId = useWatch({ name: "pipeline_id" });
 
   // Derive stages from the selected pipeline
-  const selectedPipeline = pipelines.find((p) => p.id === selectedPipelineId);
+  // Use String() comparison to handle type mismatch: Radix Select stores values
+  // as strings, but pipeline.id is a number (bigint from PostgreSQL).
+  const selectedPipeline = pipelines.find(
+    (p) => String(p.id) === String(selectedPipelineId),
+  );
   const stageChoices = selectedPipeline?.stages ?? [];
 
-  // When pipeline changes, reset the stage if it's not valid in the new pipeline
+  const isFirstRender = useRef(true);
+
+  // When pipeline changes (not on initial mount), always clear the stage
   useEffect(() => {
-    if (!selectedPipeline) return;
-    const currentStage = (
-      document.querySelector('[name="stage"]') as HTMLInputElement | null
-    )?.value;
-    const stageValid = stageChoices.some((s) => s.value === currentStage);
-    if (!stageValid && stageChoices.length > 0) {
-      setValue("stage", stageChoices[0].value);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
+    setValue("stage", "");
   }, [selectedPipelineId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const pipelineChoices = pipelines.map((p) => ({
@@ -98,9 +107,7 @@ const DealMiscInputs = () => {
 
   return (
     <div className="flex flex-col gap-4 flex-1">
-      <h3 className="text-base font-medium">
-        {translate("resources.deals.field_categories.misc")}
-      </h3>
+      <h3 className="text-base font-medium">Processo</h3>
 
       {pipelineChoices.length > 1 && (
         <SelectInput
@@ -115,25 +122,6 @@ const DealMiscInputs = () => {
       )}
 
       <SelectInput
-        source="category"
-        choices={dealCategories}
-        optionText="label"
-        optionValue="value"
-        helperText={false}
-      />
-      <NumberInput
-        source="amount"
-        defaultValue={0}
-        helperText={false}
-        validate={required()}
-      />
-      <DateInput
-        validate={required()}
-        source="expected_closing_date"
-        helperText={false}
-        defaultValue={new Date().toISOString().split("T")[0]}
-      />
-      <SelectInput
         source="stage"
         choices={stageChoices}
         optionText="label"
@@ -141,6 +129,18 @@ const DealMiscInputs = () => {
         defaultValue={stageChoices[0]?.value}
         helperText={false}
         validate={required()}
+      />
+      <NumberInput
+        source="amount"
+        defaultValue={0}
+        helperText={false}
+        validate={required()}
+      />
+      <DatePickerInput
+        validate={required()}
+        source="expected_closing_date"
+        helperText={false}
+        defaultValue={new Date().toISOString().split("T")[0]}
       />
     </div>
   );
