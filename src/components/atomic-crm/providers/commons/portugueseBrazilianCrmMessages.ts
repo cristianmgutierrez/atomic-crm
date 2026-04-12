@@ -423,7 +423,7 @@ export const portugueseBrazilianCrmMessages = {
         creating: "Criando...",
         initial_user_created: "Usuário inicial criado com sucesso",
       },
-      welcome_title: "Bem-vindo ao Atomic CRM",
+      welcome_title: "Bem-vindo ao EuInvisto.club",
     },
     common: {
       activity: "Atividade",
@@ -465,7 +465,7 @@ export const portugueseBrazilianCrmMessages = {
       latest_notes: "Minhas Últimas Notas",
       latest_notes_added_ago: "adicionado %{timeAgo}",
       stepper: {
-        install: "Instalar Atomic CRM",
+        install: "Instalar EuInvisto.club",
         progress: "%{step}/3 concluídos",
         whats_next: "O que vem a seguir?",
       },
@@ -580,7 +580,7 @@ export const portugueseBrazilianCrmMessages = {
     profile: {
       inbound: {
         description:
-          "Você pode enviar e-mails para o endereço de entrada do servidor, por ex. adicionando-o ao campo %{field}. O Atomic CRM processará os e-mails e adicionará notas aos contatos correspondentes.",
+          "Você pode enviar e-mails para o endereço de entrada do servidor, por ex. adicionando-o ao campo %{field}. O EuInvisto.club processará os e-mails e adicionará notas aos contatos correspondentes.",
         title: "E-mail de entrada",
       },
       mcp: {

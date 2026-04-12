@@ -144,11 +144,30 @@ const getDataProviderWithCustomMethods = () => {
         first_name,
         last_name,
         administrator,
-        avatar,
+        avatar: avatarData,
         disabled,
         escritorio_id,
         papel,
       } = data;
+
+      let avatar:
+        | Pick<RAFile, "src" | "path" | "title" | "type">
+        | string
+        | null
+        | undefined = undefined;
+      if (avatarData !== undefined) {
+        if (avatarData && (avatarData as any).rawFile) {
+          const uploaded = await uploadToBucket(avatarData as RAFile);
+          avatar = {
+            src: uploaded.src,
+            path: uploaded.path,
+            title: uploaded.title,
+            type: uploaded.type,
+          };
+        } else {
+          avatar = avatarData as string | null;
+        }
+      }
 
       const { data: updatedData, error } =
         await getSupabaseClient().functions.invoke<{

@@ -266,7 +266,7 @@ function createMcpServer(authInfo: AuthInfo): McpServer {
     {
       title: "Get Database Schema",
       description:
-        "Retrieve the database schema for the user's Atomic CRM instance including all tables, views, columns, types, and foreign key relationships. Views (like contacts_summary, companies_summary) are read-only and provide pre-joined/aggregated data. Use them for search and list queries.",
+        "Retrieve the database schema for the user's EuInvisto.club instance including all tables, views, columns, types, and foreign key relationships. Views (like contacts_summary, companies_summary) are read-only and provide pre-joined/aggregated data. Use them for search and list queries.",
       annotations: { readOnlyHint: true },
     },
     async () => {

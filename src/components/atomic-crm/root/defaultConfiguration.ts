@@ -1,11 +1,12 @@
 import type { ConfigurationContextValue } from "./ConfigurationContext";
+import type { TaskType } from "../types";
 
 export const defaultDarkModeLogo = "./logos/logo_atomic_crm_dark.svg";
 export const defaultLightModeLogo = "./logos/logo_atomic_crm_light.svg";
 
 export const defaultCurrency = "USD";
 
-export const defaultTitle = "Atomic CRM";
+export const defaultTitle = "EuInvisto.club";
 
 export const defaultCompanySectors = [
   { value: "communication-services", label: "Communication Services" },
@@ -47,16 +48,16 @@ export const defaultNoteStatuses = [
   { value: "transferido", label: "Transferido", color: "#e88b7d" },
 ];
 
-export const defaultTaskTypes = [
-  { value: "none", label: "None" },
-  { value: "email", label: "Email" },
-  { value: "demo", label: "Demo" },
-  { value: "lunch", label: "Lunch" },
-  { value: "meeting", label: "Meeting" },
-  { value: "follow-up", label: "Follow-up" },
-  { value: "thank-you", label: "Thank you" },
-  { value: "ship", label: "Ship" },
-  { value: "call", label: "Call" },
+export const defaultTaskTypes: TaskType[] = [
+  { value: "none", label: "None", icon: "CircleOff" },
+  { value: "call", label: "Chamada", icon: "Phone" },
+  { value: "meeting", label: "Reuniao", icon: "Users" },
+  { value: "email", label: "Email", icon: "Mail" },
+  { value: "follow-up", label: "Follow-up", icon: "Clock" },
+  { value: "lunch", label: "Almoco", icon: "UtensilsCrossed" },
+  { value: "demo", label: "Demo", icon: "Monitor" },
+  { value: "thank-you", label: "Agradecimento", icon: "Heart" },
+  { value: "ship", label: "Envio", icon: "Package" },
 ];
 
 export const defaultConfiguration: ConfigurationContextValue = {
