@@ -1,16 +1,4 @@
-import {
-  Phone,
-  Users,
-  Mail,
-  Clock,
-  UtensilsCrossed,
-  Monitor,
-  Heart,
-  Package,
-  CircleOff,
-  CircleDot,
-  type LucideIcon,
-} from "lucide-react";
+import { icons, CircleDot, type LucideIcon } from "lucide-react";
 import { useInput, FieldTitle, useResourceContext } from "ra-core";
 import type { InputProps } from "ra-core";
 
@@ -25,22 +13,9 @@ import {
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 
-const ICON_MAP: Record<string, LucideIcon> = {
-  Phone,
-  Users,
-  Mail,
-  Clock,
-  UtensilsCrossed,
-  Monitor,
-  Heart,
-  Package,
-  CircleOff,
-  CircleDot,
-};
-
 export const getTaskTypeIcon = (iconName?: string): LucideIcon => {
   if (!iconName) return CircleDot;
-  return ICON_MAP[iconName] ?? CircleDot;
+  return (icons as Record<string, LucideIcon>)[iconName] ?? CircleDot;
 };
 
 export const TaskTypeIconBar = (props: TaskTypeIconBarProps) => {
@@ -123,4 +98,4 @@ export const TaskTypeIconBar = (props: TaskTypeIconBarProps) => {
   );
 };
 
-export type TaskTypeIconBarProps = InputProps;
+export type TaskTypeIconBarProps = InputProps & { className?: string };

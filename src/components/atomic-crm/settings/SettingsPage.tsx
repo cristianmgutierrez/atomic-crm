@@ -28,6 +28,7 @@ import {
 } from "../root/ConfigurationContext";
 import { defaultConfiguration } from "../root/defaultConfiguration";
 import { PipelinesSettings } from "./PipelinesSettings";
+import { TaskIconPickerInput } from "./TaskIconPickerInput";
 
 const SECTIONS = [
   {
@@ -381,8 +382,9 @@ const SettingsFormFields = () => {
               {translate("crm.settings.tasks.types")}
             </h3>
             <ArrayInput source="taskTypes" label={false} helperText={false}>
-              <SimpleFormIterator disableReordering disableClear>
-                <TextInput source="label" label={false} />
+              <SimpleFormIterator inline disableReordering disableClear>
+                <TaskIconPickerInput source="icon" />
+                <TextInput source="label" label={false} className="flex-1" />
               </SimpleFormIterator>
             </ArrayInput>
           </CardContent>
