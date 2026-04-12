@@ -174,7 +174,16 @@ create table public.tasks (
     due_date timestamp with time zone,
     done_date timestamp with time zone,
     sales_id bigint,
-    escritorio_id bigint
+    escritorio_id bigint,
+    start_time text,
+    end_time text,
+    end_date timestamp with time zone,
+    notes text,
+    deal_id bigint,
+    source text default 'manual',
+    external_id text,
+    external_url text,
+    metadata jsonb default '{}'::jsonb
 );
 
 create table public.configuration (
@@ -262,6 +271,9 @@ alter table public.tags
 alter table public.tasks
     add constraint tasks_escritorio_id_fkey foreign key (escritorio_id) references public.escritorios(id);
 
+alter table public.tasks
+    add constraint tasks_deal_id_fkey foreign key (deal_id) references public.deals(id) on update cascade on delete set null;
+
 --
 -- Indexes on foreign keys
 --
@@ -271,3 +283,5 @@ create index contacts_company_id_idx on public.contacts using btree (company_id)
 create index deal_notes_deal_id_idx on public.deal_notes using btree (deal_id);
 create index deals_company_id_idx on public.deals using btree (company_id);
 create index deals_pipeline_id_idx on public.deals using btree (pipeline_id);
+create index tasks_deal_id_idx on public.tasks using btree (deal_id);
+create unique index tasks_external_id_source_idx on public.tasks (external_id, source) where external_id is not null;

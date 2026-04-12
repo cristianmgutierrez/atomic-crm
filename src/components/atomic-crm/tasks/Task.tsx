@@ -20,10 +20,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import type { Contact, Task as TData } from "../types";
+import type { Contact, Deal, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTaskTypeIcon } from "./TaskTypeIconBar";
 
 export const Task = ({
   task,
@@ -74,7 +75,7 @@ export const Task = ({
   };
 
   useEffect(() => {
-    // We do not want to invalidate the query when a tack is checked or unchecked
+    // We do not want to invalidate the query when a task is checked or unchecked
     if (
       isUpdatePending ||
       !isSuccess ||
@@ -87,6 +88,18 @@ export const Task = ({
   }, [queryClient, isUpdatePending, isSuccess, variables]);
 
   const labelId = `checkbox-list-label-${task.id}`;
+
+  // Find the matching task type for icon display
+  const matchedTaskType = taskTypes.find(
+    (taskType) => taskType.value === task.type,
+  );
+  const TypeIcon = getTaskTypeIcon(matchedTaskType?.icon);
+
+  // Format time display
+  const timeDisplay =
+    task.start_time || task.end_time
+      ? [task.start_time, task.end_time].filter(Boolean).join(" - ")
+      : null;
 
   return (
     <>
@@ -103,28 +116,37 @@ export const Task = ({
             className="mt-1"
           />
           <div className={`flex-grow ${task.done_date ? "line-through" : ""}`}>
-            <div className="text-sm">
+            <div className="flex items-center gap-1.5 text-sm">
               {task.type && task.type !== "none" && (
-                <>
-                  <span className="font-semibold text-sm">
-                    {(() => {
-                      const matchedTaskType = taskTypes.find(
-                        (taskType) => taskType.value === task.type,
-                      );
-                      return matchedTaskType
-                        ? matchedTaskType.label
-                        : task.type;
-                    })()}
-                  </span>
-                  &nbsp;
-                </>
+                <TypeIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
               )}
-              {task.text}
+              <span>{task.text}</span>
             </div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-1">
               {translate("resources.tasks.fields.due_short")}
               &nbsp;
-              <DateField source="due_date" record={task} showDate showTime />
+              <DateField
+                source="due_date"
+                record={task}
+                showDate
+                showTime={false}
+              />
+              {timeDisplay && <span className="text-xs">({timeDisplay})</span>}
+              {task.deal_id && (
+                <ReferenceField<TData, Deal>
+                  source="deal_id"
+                  reference="deals"
+                  record={task}
+                  link="show"
+                  className="inline text-sm text-muted-foreground"
+                  render={({ referenceRecord }) => {
+                    if (!referenceRecord) return null;
+                    return (
+                      <span className="text-xs"> | {referenceRecord.name}</span>
+                    );
+                  }}
+                />
+              )}
               {showContact && (
                 <ReferenceField<TData, Contact>
                   source="contact_id"

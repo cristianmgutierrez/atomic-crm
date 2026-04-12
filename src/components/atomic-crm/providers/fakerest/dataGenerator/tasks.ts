@@ -37,17 +37,24 @@ export const generateTasks = (db: Db) => {
   return Array.from(Array(400).keys()).map<Task>((id) => {
     const contact = random.arrayElement(db.contacts);
     contact.nb_tasks++;
+    const dueDate = randomDate(
+      datatype.boolean() ? new Date() : new Date(contact.first_seen),
+      new Date(Date.now() + 100 * 24 * 60 * 60 * 1000),
+    );
     return {
       id,
       contact_id: contact.id,
       type: random.arrayElement(defaultTaskTypes).value,
       text: lorem.sentence(),
-      due_date: randomDate(
-        datatype.boolean() ? new Date() : new Date(contact.first_seen),
-        new Date(Date.now() + 100 * 24 * 60 * 60 * 1000),
-      ).toISOString(),
+      due_date: dueDate.toISOString().slice(0, 10),
+      end_date: dueDate.toISOString().slice(0, 10),
+      start_time: undefined,
+      end_time: undefined,
+      notes: undefined,
+      deal_id: undefined,
       done_date: undefined,
       sales_id: 0,
+      source: "manual",
     };
   });
 };

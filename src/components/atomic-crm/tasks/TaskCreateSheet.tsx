@@ -76,9 +76,10 @@ export const TaskCreateSheet = ({
       }
       redirect={false}
       record={{
-        type: "none",
+        type: "call",
         contact_id,
-        due_date: new Date().toISOString(),
+        due_date: new Date().toISOString().slice(0, 10),
+        end_date: new Date().toISOString().slice(0, 10),
         sales_id: identity.id,
       }}
       mutationOptions={{
@@ -87,7 +88,7 @@ export const TaskCreateSheet = ({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <TaskFormContent selectContact={selectContact} />
+      <TaskFormContent />
     </CreateSheet>
   );
 };

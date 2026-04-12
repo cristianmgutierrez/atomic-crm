@@ -103,9 +103,10 @@ export const AddTask = ({
       <CreateBase
         resource="tasks"
         record={{
-          type: "none",
+          type: "call",
           contact_id: contact?.id,
-          due_date: new Date().toISOString(),
+          due_date: new Date().toISOString().slice(0, 10),
+          end_date: new Date().toISOString().slice(0, 10),
           sales_id: identity.id,
         }}
         mutationOptions={{ onSuccess: handleSuccess }}
@@ -122,7 +123,7 @@ export const AddTask = ({
                     : translate("resources.tasks.dialog.create")}
                 </DialogTitle>
               </DialogHeader>
-              <TaskFormContent selectContact={selectContact} />
+              <TaskFormContent />
               <DialogFooter className="w-full justify-end">
                 <SaveButton />
               </DialogFooter>

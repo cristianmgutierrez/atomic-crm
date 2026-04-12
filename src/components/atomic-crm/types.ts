@@ -197,13 +197,25 @@ export type Tag = {
   color: string;
 };
 
+export type TaskType = {
+  value: string;
+  label: string;
+  icon?: string;
+};
+
 export type Task = {
   contact_id: Identifier;
   type: string;
   text: string;
   due_date: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  end_date?: string | null;
+  notes?: string | null;
+  deal_id?: Identifier | null;
   done_date?: string | null;
   sales_id?: Identifier;
+  source?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type ActivityCompanyCreated = {

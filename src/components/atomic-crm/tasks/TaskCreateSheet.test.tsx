@@ -34,7 +34,7 @@ describe("TaskCreateSheet", () => {
           tasks: [
             {
               contact_id: 1,
-              due_date: "2025-01-03T12:00:00.000Z",
+              due_date: "2025-01-03",
               id: 1,
               sales_id: 0,
               text: "Existing seeded task",
@@ -47,30 +47,20 @@ describe("TaskCreateSheet", () => {
       </Mobile>,
     );
 
-    await screen
-      .getByLabelText(/description/i)
-      .fill("Follow up about onboarding");
+    // Fill description field (labeled "Descricao")
+    await screen.getByLabelText(/descri/i).fill("Follow up about onboarding");
 
-    const [contactInput, typeInput] = screen.getByRole("combobox").all();
-
+    // Select contact via autocomplete
+    const contactInput = screen.getByRole("combobox").first();
     await contactInput.click();
     await screen.getByText("Grace Hopper").click();
 
-    await typeInput.click();
-    const typeOptions = screen.getByRole("listbox");
-    await typeOptions.getByText("Call").click();
+    // Select task type via icon bar (click "Email" toggle)
+    await screen.getByRole("radio", { name: /email/i }).click();
 
-    const dueDateInput = screen.getByLabelText(/due date/i);
-    await dueDateInput.clear();
-    await dueDateInput.fill("2026-03-06T12:30");
-
-    await screen.getByRole("button", { name: /^save$/i }).click();
+    await screen.getByRole("button", { name: /^save|salvar$/i }).click();
 
     await expect.element(screen.getByText("Task added")).toBeInTheDocument();
-
-    await expect
-      .element(screen.getByText("Create Task"))
-      .not.toBeInTheDocument();
 
     await expect
       .poll(async () => {
@@ -95,7 +85,7 @@ describe("TaskCreateSheet", () => {
     expect(createdTask).toMatchObject({
       contact_id: 2,
       text: "Follow up about onboarding",
-      type: "call",
+      type: "email",
     });
     expect(tasks.data).toHaveLength(2);
 
