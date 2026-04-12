@@ -29,7 +29,7 @@ const Header = () => {
 
   return (
     <>
-      <nav className="grow">
+      <nav className="grow sticky top-0 z-50">
         <header className="bg-secondary">
           <div className="px-4">
             <div className="flex justify-between items-center flex-1">
