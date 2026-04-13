@@ -47,10 +47,27 @@ export const DatePickerInput = (props: DatePickerInputProps) => {
     ...rest,
   });
 
+  // Normalize ISO timestamps from DB (timestamptz) to YYYY-MM-DD on mount
+  React.useEffect(() => {
+    if (
+      field.value &&
+      typeof field.value === "string" &&
+      field.value.includes("T")
+    ) {
+      field.onChange(field.value.slice(0, 10));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Parse the YYYY-MM-DD string from form state to a Date object
   const selectedDate = React.useMemo(() => {
     if (!field.value) return undefined;
-    const parsed = parse(field.value, "yyyy-MM-dd", new Date());
+    // Normalize ISO timestamps to YYYY-MM-DD before parsing
+    const dateStr =
+      typeof field.value === "string" && field.value.includes("T")
+        ? field.value.slice(0, 10)
+        : field.value;
+    const parsed = parse(dateStr, "yyyy-MM-dd", new Date());
     return isValid(parsed) ? parsed : undefined;
   }, [field.value]);
 

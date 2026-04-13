@@ -20,22 +20,34 @@ export const isRecentlyDone = (task: Task) =>
   task.done_date != null &&
   isAfter(new Date(task.done_date), new Date(Date.now() - 5 * 60 * 1000));
 
+/**
+ * Parses a date string as local midnight to avoid timezone shifts.
+ * Handles both "YYYY-MM-DD" and "YYYY-MM-DDT..." (ISO timestamps from timestamptz columns).
+ */
+const parseLocalDate = (dateString: string): Date => {
+  const datePart = dateString.includes("T")
+    ? dateString.slice(0, 10)
+    : dateString;
+  const [y, m, d] = datePart.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+
 export const isOverdue = (dateString: string) => {
-  return new Date(dateString) < startOfToday();
+  return parseLocalDate(dateString) < startOfToday();
 };
 
 export const isDueToday = (dateString: string) => {
-  const dueDate = new Date(dateString);
+  const dueDate = parseLocalDate(dateString);
   return dueDate >= startOfToday() && dueDate < endOfToday();
 };
 
 export const isDueTomorrow = (dateString: string) => {
-  const dueDate = new Date(dateString);
+  const dueDate = parseLocalDate(dateString);
   return dueDate >= endOfToday() && dueDate < endOfTomorrow();
 };
 
 export const isDueThisWeek = (dateString: string) => {
-  const dueDate = new Date(dateString);
+  const dueDate = parseLocalDate(dateString);
   return (
     dueDate >= endOfTomorrow() &&
     dueDate < endOfWeek(new Date(), { weekStartsOn: 0 })
@@ -43,6 +55,6 @@ export const isDueThisWeek = (dateString: string) => {
 };
 
 export const isDueLater = (dateString: string) => {
-  const dueDate = new Date(dateString);
+  const dueDate = parseLocalDate(dateString);
   return dueDate >= endOfWeek(new Date(), { weekStartsOn: 0 });
 };

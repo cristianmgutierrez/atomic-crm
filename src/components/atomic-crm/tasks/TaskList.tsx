@@ -19,6 +19,7 @@ import { AddTask } from "./AddTask";
 import { TaskEdit } from "./TaskEdit";
 import { TaskPageFilter } from "./TaskPageFilter";
 import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { isOverdue, isDueToday } from "./tasksPredicate";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 
 // ─── Actions toolbar ──────────────────────────────────────────────────────────
@@ -61,7 +62,7 @@ const TypeIconCell = ({ task }: { task: Task }) => {
   const matchedType = taskTypes.find((t) => t.value === task.type);
   const Icon = getTaskTypeIcon(matchedType?.icon);
   return (
-    <div className="flex items-center gap-1.5 text-muted-foreground">
+    <div className="flex items-center gap-1.5">
       <Icon className="h-4 w-4 shrink-0" />
       <span className="text-xs hidden lg:inline">{matchedType?.label}</span>
     </div>
@@ -75,7 +76,7 @@ const TimeCell = ({ task }: { task: Task }) => {
     task.start_time || task.end_time
       ? [task.start_time, task.end_time].filter(Boolean).join(" - ")
       : "—";
-  return <span className="text-xs text-muted-foreground">{display}</span>;
+  return <span className="text-xs">{display}</span>;
 };
 
 // ─── Desktop layout ───────────────────────────────────────────────────────────
@@ -112,6 +113,14 @@ const TaskListLayoutDesktop = () => {
               }}
               bulkActionButtons={false}
               className="border-0 rounded-none"
+              rowClassName={(record: Task) => {
+                if (record.done_date) return "text-muted-foreground";
+                if (record.due_date && isOverdue(record.due_date))
+                  return "text-red-500";
+                if (record.due_date && isDueToday(record.due_date))
+                  return "text-green-600";
+                return "";
+              }}
             >
               <DataTable.Col
                 source="done_date"
@@ -129,11 +138,7 @@ const TaskListLayoutDesktop = () => {
                 source="text"
                 label={translate("resources.tasks.fields.text")}
                 render={(r: Task) => (
-                  <span
-                    className={
-                      r.done_date ? "line-through text-muted-foreground" : ""
-                    }
-                  >
+                  <span className={r.done_date ? "line-through" : ""}>
                     {r.text}
                   </span>
                 )}
