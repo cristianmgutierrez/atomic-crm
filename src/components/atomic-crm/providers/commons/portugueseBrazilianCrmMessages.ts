@@ -96,7 +96,7 @@ export const portugueseBrazilianCrmMessages = {
         date_of_birth: "Data de Nascimento",
         xp_code: "Código XP",
         monthly_income: "Renda Mensal",
-        website: "Site Pessoal / Empresa",
+        website: "Instagram",
         // Aba 2 - novos
         segment: "Segmento",
         investor_profile: "Perfil de Investidor",
@@ -610,6 +610,7 @@ export const portugueseBrazilianCrmMessages = {
     validation: {
       invalid_url: "Deve ser uma URL válida",
       invalid_linkedin_url: "A URL deve ser do linkedin.com",
+      invalid_instagram_handle: "Instagram inválido (ex: @usuario ou usuario)",
     },
   },
 } satisfies CrmMessages;

@@ -9,7 +9,7 @@ import {
   Calendar,
   Check,
   CreditCard,
-  Globe,
+  Instagram,
   Linkedin,
   Mail,
   Phone,
@@ -62,18 +62,20 @@ export const ContactPersonalInfo = () => {
         />
       )}
 
-      {/* Website */}
+      {/* Instagram */}
       {record.website && (
         <PersonalInfoRow
-          icon={<Globe className="w-4 h-4 text-muted-foreground" />}
+          icon={<Instagram className="w-4 h-4 text-muted-foreground" />}
           primary={
             <a
               className="underline hover:no-underline text-sm text-muted-foreground"
-              href={record.website}
+              href={`https://www.instagram.com/${record.website.replace(/^@/, "")}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {record.website}
+              {record.website.startsWith("@")
+                ? record.website
+                : `@${record.website}`}
             </a>
           }
         />

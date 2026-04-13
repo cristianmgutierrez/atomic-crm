@@ -23,6 +23,19 @@ import { ArrayInput } from "@/components/admin/array-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
+
+const INSTAGRAM_HANDLE_REGEX = /^[a-zA-Z0-9_.]{1,30}$/;
+
+const isInstagramHandle = (value: string) => {
+  if (!value) return;
+  const handle = value.startsWith("@") ? value.slice(1) : value;
+  if (!INSTAGRAM_HANDLE_REGEX.test(handle)) {
+    return {
+      message: "crm.validation.invalid_instagram_handle",
+      args: { _: "Invalid Instagram handle (e.g. @username or username)" },
+    };
+  }
+};
 import { StatusSelector } from "../notes";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Contact, Sale } from "../types";
@@ -462,6 +475,7 @@ const Tab1PersonalInfo = () => {
           source="website"
           label="resources.contacts.fields.website"
           helperText={false}
+          validate={isInstagramHandle}
         />
       </div>
 

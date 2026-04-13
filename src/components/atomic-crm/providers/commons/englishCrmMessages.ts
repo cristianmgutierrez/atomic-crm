@@ -82,6 +82,7 @@ export const englishCrmMessages = {
         phone_jsonb: "Phone numbers",
         phone_number: "Phone number",
         linkedin_url: "LinkedIn URL",
+        website: "Instagram",
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
         sales_id: "Account manager",
@@ -573,6 +574,8 @@ export const englishCrmMessages = {
     validation: {
       invalid_url: "Must be a valid URL",
       invalid_linkedin_url: "URL must be from linkedin.com",
+      invalid_instagram_handle:
+        "Invalid Instagram handle (e.g. @username or username)",
     },
   },
 } as const;
