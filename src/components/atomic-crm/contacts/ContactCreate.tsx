@@ -39,6 +39,7 @@ export const ContactCreate = ({
         <div className="flex-1">
           <Form
             validate={validateContactForm}
+            mode="onBlur"
             defaultValues={{
               sales_id: identity?.id,
               email_jsonb: defaultEmailJsonb,

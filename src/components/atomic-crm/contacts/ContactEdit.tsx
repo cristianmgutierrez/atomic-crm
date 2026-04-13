@@ -13,6 +13,14 @@ import {
   isoToDisplay,
   validateContactForm,
 } from "./contactModel";
+import { maskCurrency } from "./utils/masks";
+
+const toMaskedCurrency = (v: number | string | null | undefined): string => {
+  if (v == null || v === "") return "";
+  const num = typeof v === "string" ? parseFloat(v) : v;
+  if (isNaN(num)) return "";
+  return maskCurrency(Math.round(num * 100).toString());
+};
 
 export const ContactEdit = ({
   mutationMode = "pessimistic",
@@ -41,6 +49,9 @@ const normalizeContactArrayFields = (record: Contact) => ({
   // Convert ISO dates (YYYY-MM-DD) to display format (DD/MM/AAAA)
   date_of_birth: isoToDisplay(record.date_of_birth),
   relationship_start_date: isoToDisplay(record.relationship_start_date),
+  // Convert numeric DB values to masked currency strings for display
+  monthly_income: toMaskedCurrency(record.monthly_income),
+  declared_wealth: toMaskedCurrency(record.declared_wealth),
 });
 
 const preventEnterSubmit = (e: React.KeyboardEvent) => {
@@ -56,6 +67,7 @@ const ContactEditContent = () => {
     <div className="mt-2 flex gap-8" onKeyDown={preventEnterSubmit}>
       <Form
         validate={validateContactForm}
+        mode="onBlur"
         className="flex flex-1 flex-col gap-4"
         record={normalizeContactArrayFields(record)}
       >

@@ -7,6 +7,7 @@ import {
   validateCNPJ,
   validateDate,
 } from "./utils/validations";
+import { unmaskCurrency } from "./utils/masks";
 
 /** Convert ISO date (YYYY-MM-DD) to display format (DD/MM/AAAA) */
 export const isoToDisplay = (
@@ -29,6 +30,14 @@ export const displayToIso = (
 export const defaultEmailJsonb = [{ email: null, type: null }];
 export const defaultPhoneJsonb = [{ number: null, type: null }];
 
+const parseCurrencyField = (
+  value: string | number | null | undefined,
+): number | null => {
+  if (value == null || value === "") return null;
+  const parsed = parseFloat(unmaskCurrency(String(value)));
+  return isNaN(parsed) ? null : parsed;
+};
+
 const cleanContactArrayFields = (data: Contact) => {
   const cleanedEmailJsonb =
     data.email_jsonb?.filter((e) => e.email != null) || [];
@@ -41,6 +50,9 @@ const cleanContactArrayFields = (data: Contact) => {
     // Convert DD/MM/AAAA → ISO for PostgreSQL date columns
     date_of_birth: displayToIso(data.date_of_birth),
     relationship_start_date: displayToIso(data.relationship_start_date),
+    // Convert masked currency strings → numeric for PostgreSQL numeric columns
+    monthly_income: parseCurrencyField(data.monthly_income),
+    declared_wealth: parseCurrencyField(data.declared_wealth),
   };
 };
 
