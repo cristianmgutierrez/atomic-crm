@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
-import { isValidElement, useCallback } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { isValidElement, useCallback, useRef } from "react";
+import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -20,6 +21,7 @@ import {
 } from "@/components/admin/form";
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
@@ -149,6 +151,7 @@ export const AutocompleteInput = (
     setOpen(isOpen);
     // Reset the filter when the popover is closed
     if (!isOpen) {
+      setFilterValue("");
       setFilters(filterToQuery(""));
     }
   });
@@ -165,17 +168,16 @@ export const AutocompleteInput = (
         return;
       }
       field.onChange(getChoiceValue(choice));
+      setFilterValue("");
       setOpen(false);
     },
     [
       field,
       getChoiceValue,
       isRequired,
-      setFilterValue,
       isFromReference,
       setFilters,
       filterToQuery,
-      setOpen,
     ],
   );
 
@@ -206,6 +208,183 @@ export const AutocompleteInput = (
     finalChoices = [...finalChoices, createItem];
   }
 
+  // Inline mode: Input as anchor, popover opens on focus/typing
+  const inlineMode = !modal;
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleInlineInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFilterValue(value);
+    if (isFromReference) {
+      setFilters(filterToQuery(value));
+    }
+    requestAnimationFrame(() => {
+      listRef.current?.scrollTo(0, 0);
+    });
+    if (!open) setOpen(true);
+  };
+
+  const handleInlineFocus = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setOpen(true);
+  };
+
+  const handleInlineBlur = () => {
+    // Delay closing so item clicks register first
+    closeTimerRef.current = setTimeout(() => {
+      setOpen(false);
+      setFilterValue("");
+      if (isFromReference) setFilters(filterToQuery(""));
+    }, 150);
+  };
+
+  const handleInlineClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    field.onChange("");
+    setFilterValue("");
+    if (isFromReference) setFilters(filterToQuery(""));
+  };
+
+  // Get display text for the selected choice (string only for inline input)
+  const getSelectedText = useCallback(
+    (choice: any): string => {
+      const text = getChoiceText(choice);
+      if (typeof text === "string") return text;
+      // Fallback for React element optionText (e.g. contactOptionText):
+      // try inputText prop, then common record field names
+      if (typeof inputText === "function") {
+        const result = inputText(choice);
+        if (typeof result === "string") return result;
+      }
+      // Extract from common fields (name, first_name/last_name, label)
+      if (choice?.name) return choice.name;
+      const fullName = [choice?.first_name, choice?.last_name]
+        .filter(Boolean)
+        .join(" ");
+      if (fullName) return fullName;
+      return choice?.label ?? String(choice?.id ?? "");
+    },
+    [getChoiceText, inputText],
+  );
+
+  if (inlineMode) {
+    const inlineInputValue = open
+      ? filterValue
+      : selectedChoice
+        ? getSelectedText(selectedChoice)
+        : "";
+
+    return (
+      <>
+        <FormField className={props.className} id={id} name={source}>
+          {props.label !== false && (
+            <FormLabel id={uniqueId}>
+              <FieldTitle
+                label={props.label}
+                source={props.source ?? source}
+                resource={resource}
+                isRequired={isRequired}
+              />
+            </FormLabel>
+          )}
+          <FormControl>
+            <Popover open={open} onOpenChange={handleOpenChange}>
+              <PopoverAnchor asChild>
+                <div className="relative">
+                  <Input
+                    id={id}
+                    aria-labelledby={uniqueId}
+                    value={inlineInputValue}
+                    onChange={handleInlineInputChange}
+                    onFocus={handleInlineFocus}
+                    onBlur={handleInlineBlur}
+                    placeholder={placeholder}
+                    autoComplete="off"
+                    className={cn("w-full", selectedChoice && !open && "pr-8")}
+                  />
+                  {selectedChoice && !open && (
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      onClick={handleInlineClear}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label="Limpar seleção"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </PopoverAnchor>
+              <PopoverContent
+                className="w-full max-w-(--radix-popover-anchor-width) p-0"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onCloseAutoFocus={(e) => e.preventDefault()}
+              >
+                <Command shouldFilter={!isFromReference}>
+                  <CommandList ref={listRef}>
+                    <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {finalChoices.map((choice) => {
+                        const isCreateItem =
+                          !!createItem && choice?.id === createItem.id;
+                        const disabled = getOptionDisabled(choice);
+                        const choiceText = getChoiceText(
+                          isCreateItem ? createItem : choice,
+                        );
+
+                        return (
+                          <CommandItem
+                            key={getChoiceValue(choice)}
+                            value={
+                              isCreateItem
+                                ? `?${filterValue}?`
+                                : getChoiceValue(choice)
+                            }
+                            keywords={
+                              isCreateItem || isValidElement(choiceText)
+                                ? undefined
+                                : [choiceText]
+                            }
+                            onMouseDown={(e) => e.preventDefault()}
+                            onSelect={() => {
+                              if (closeTimerRef.current) {
+                                clearTimeout(closeTimerRef.current);
+                                closeTimerRef.current = null;
+                              }
+                              handleChangeWithCreateSupport(choice);
+                            }}
+                            disabled={disabled}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                field.value === getChoiceValue(choice)
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            {choiceText}
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormControl>
+          <InputHelperText helperText={props.helperText} />
+          <FormError />
+        </FormField>
+        {createElement}
+      </>
+    );
+  }
+
+  // Original modal/button mode
   return (
     <>
       <FormField className={props.className} id={id} name={source}>
@@ -248,8 +427,6 @@ export const AutocompleteInput = (
                     requestAnimationFrame(() => {
                       listRef.current?.scrollTo(0, 0);
                     });
-                    // We don't want the ChoicesContext to filter the choices if the input
-                    // is not from a reference as it would also filter out the selected values
                     if (isFromReference) {
                       setFilters(filterToQuery(filter));
                     }
@@ -272,10 +449,7 @@ export const AutocompleteInput = (
                           key={getChoiceValue(choice)}
                           value={
                             isCreateItem
-                              ? // if it's the create option, include the filter value so it is shown in the command input
-                                // characters before and after the filter value are required
-                                // to show the option when the filter value starts or ends with a space
-                                `?${filterValue}?`
+                              ? `?${filterValue}?`
                               : getChoiceValue(choice)
                           }
                           keywords={

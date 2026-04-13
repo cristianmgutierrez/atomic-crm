@@ -1,7 +1,9 @@
 import { DeleteButton } from "@/components/admin";
 import { SaveButton } from "@/components/admin/form";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -133,7 +135,7 @@ export const EditSheet = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-dvh flex flex-col"
+        className="!h-dvh !w-full flex flex-col"
         aria-describedby={undefined}
       >
         <EditBase
@@ -144,7 +146,7 @@ export const EditSheet = ({
         >
           <Form
             defaultValues={defaultValues}
-            className="h-dvh flex-1 flex flex-col"
+            className="h-dvh flex-1 flex flex-col max-w-6xl mx-auto w-full"
           >
             <SheetHeader className="border-b">
               <SheetTitle>
@@ -152,13 +154,18 @@ export const EditSheet = ({
               </SheetTitle>
             </SheetHeader>
 
-            <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
+            <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
               {children}
             </div>
 
             <SheetFooter className="border-t">
-              <div className="flex w-full gap-4">
+              <div className="flex w-full gap-2">
                 {deleteButton || defaultDeleteButton}
+                <SheetClose asChild>
+                  <Button variant="ghost" className="flex-1">
+                    Cancelar
+                  </Button>
+                </SheetClose>
                 <SaveButton className="flex-1" />
               </div>
             </SheetFooter>

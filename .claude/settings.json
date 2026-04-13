@@ -7,7 +7,12 @@
       "Bash(xargs ls:*)",
       "Bash(node -e \"const lucide = require\\('lucide-react'\\); const icon = lucide.icons['Phone']; console.log\\('Type:', typeof icon\\); console.log\\('Keys:', Object.keys\\(icon\\)\\)\")",
       "Bash(git add:*)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npx vite:*)",
+      "Bash(ls dist/assets/*.css)",
+      "Bash(node -e ':*)",
+      "Bash(node -e \" const css = require\\('fs'\\).readFileSync\\('dist/assets/index-CrfFmimf.css', 'utf8'\\); // Find rules targeting input elements const re = /\\([^{}]*\\\\binput\\\\b[^{]*\\)\\\\{\\([^}]+\\)\\\\}/gi; let match; while \\(\\(match = re.exec\\(css\\)\\) !== null\\) { const sel = match[1].trim\\(\\).slice\\(-80\\); const rules = match[2]; console.log\\('SEL: ...' + sel\\); rules.split\\(';'\\).forEach\\(r => { if\\(r.trim\\(\\)\\) console.log\\(' ' + r.trim\\(\\)\\); }\\); console.log\\(''\\); } \")"
     ]
   },
   "hooks": {

@@ -11,7 +11,12 @@ import {
   Redo,
 } from "lucide-react";
 import type { InputProps } from "ra-core";
-import { useInput, FieldTitle, useResourceContext } from "ra-core";
+import {
+  useInput,
+  FieldTitle,
+  useResourceContext,
+  useLocaleState,
+} from "ra-core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -37,6 +42,11 @@ export const RichTextInput = (props: RichTextInputProps) => {
   } = props;
 
   const resource = useResourceContext(props);
+  const [rawLocale = "en"] = useLocaleState();
+  const locale = rawLocale.replace(
+    /-(\w+)$/,
+    (_, cc: string) => "-" + cc.toUpperCase(),
+  );
 
   const { field, id, isRequired } = useInput({
     defaultValue: defaultValue ?? "",
@@ -51,6 +61,12 @@ export const RichTextInput = (props: RichTextInputProps) => {
     extensions: [StarterKit, Image, Placeholder.configure({ placeholder })],
     content: field.value || "",
     editable: !disabled && !readOnly,
+    editorProps: {
+      attributes: {
+        spellcheck: "true",
+        lang: locale,
+      },
+    },
     onUpdate: ({ editor: e }) => {
       const html = e.getHTML();
       field.onChange(html === "<p></p>" ? "" : html);

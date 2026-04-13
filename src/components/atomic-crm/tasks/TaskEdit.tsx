@@ -46,8 +46,8 @@ export const TaskEdit = ({
           }}
           redirect={false}
         >
-          <DialogContent className="lg:max-w-xl overflow-y-auto max-h-9/10 top-1/20 translate-y-0">
-            <Form className="flex flex-col gap-4">
+          <DialogContent className="lg:max-w-2xl overflow-y-auto overflow-x-hidden max-h-9/10 top-1/20 translate-y-0">
+            <Form className="flex flex-col gap-4 min-w-0">
               <DialogHeader>
                 <DialogTitle>
                   {translate("resources.tasks.action.edit")}

@@ -1,5 +1,10 @@
 import type { InputProps } from "ra-core";
-import { useInput, useResourceContext, FieldTitle } from "ra-core";
+import {
+  useInput,
+  useResourceContext,
+  FieldTitle,
+  useLocaleState,
+} from "ra-core";
 import {
   FormControl,
   FormError,
@@ -39,6 +44,11 @@ export type TextInputProps = InputProps & {
  */
 export const TextInput = (props: TextInputProps) => {
   const resource = useResourceContext(props);
+  const [rawLocale = "en"] = useLocaleState();
+  const locale = rawLocale.replace(
+    /-(\w+)$/,
+    (_, cc: string) => "-" + cc.toUpperCase(),
+  );
   const {
     label,
     source,
@@ -66,9 +76,19 @@ export const TextInput = (props: TextInputProps) => {
       )}
       <FormControl>
         {multiline ? (
-          <Textarea {...rest} {...field} className={inputClassName} />
+          <Textarea
+            {...rest}
+            {...field}
+            className={inputClassName}
+            lang={locale}
+          />
         ) : (
-          <Input {...rest} {...field} className={inputClassName} />
+          <Input
+            {...rest}
+            {...field}
+            className={inputClassName}
+            lang={locale}
+          />
         )}
       </FormControl>
       <InputHelperText helperText={helperText} />

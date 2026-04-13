@@ -18,6 +18,7 @@ import { OAuthConsentPage } from "@/components/supabase/oauth-consent-page";
 import companies from "../companies";
 import contacts from "../contacts";
 import escritorios from "../escritorios";
+import tasks from "../tasks";
 import { Dashboard } from "../dashboard/Dashboard";
 import { MobileDashboard } from "../dashboard/MobileDashboard";
 import deals from "../deals";
@@ -261,7 +262,7 @@ const DesktopAdmin = (
       <Resource name="companies" {...companies} />
       <Resource name="contact_notes" />
       <Resource name="deal_notes" />
-      <Resource name="tasks" />
+      <Resource name="tasks" {...tasks} />
       <Resource name="sales" {...sales} />
       <Resource name="tags" />
       <Resource name="pipelines" />

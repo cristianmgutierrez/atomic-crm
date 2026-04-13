@@ -121,7 +121,7 @@ export const CreateSheet = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-dvh flex flex-col"
+        className="!h-dvh !w-full flex flex-col"
         aria-describedby={undefined}
       >
         <CreateBase
@@ -131,7 +131,7 @@ export const CreateSheet = ({
         >
           <Form
             defaultValues={defaultValues}
-            className="h-dvh flex-1 flex flex-col"
+            className="h-dvh flex-1 flex flex-col max-w-6xl mx-auto w-full"
           >
             <SheetHeader className="border-b">
               <SheetTitle>
@@ -143,7 +143,7 @@ export const CreateSheet = ({
               </SheetTitle>
             </SheetHeader>
 
-            <div className="flex-1 overflow-y-auto flex flex-col gap-3 p-4">
+            <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
               {children}
             </div>
 
