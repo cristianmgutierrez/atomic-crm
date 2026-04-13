@@ -10,6 +10,7 @@ import { formatLocalizedDate } from "../misc/RelativeDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { Contact } from "../types";
 import { MapPin, TrendingUp } from "lucide-react";
+import { formatCurrencyBRL } from "./contactFieldConfig";
 
 export const ContactBackgroundInfo = () => {
   const record = useRecordContext<Contact>();
@@ -102,11 +103,7 @@ export const ContactBackgroundInfo = () => {
             )}
             {record.declared_wealth != null && (
               <span>
-                Patrimônio:{" "}
-                {Number(record.declared_wealth).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
+                Patrimônio: {formatCurrencyBRL(record.declared_wealth)}
               </span>
             )}
             {record.relationship_start_date && (

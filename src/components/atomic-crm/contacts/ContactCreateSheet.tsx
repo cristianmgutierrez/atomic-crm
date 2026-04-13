@@ -3,8 +3,7 @@ import { CreateSheet } from "../misc/CreateSheet";
 import { ContactInputs } from "./ContactInputs";
 import {
   cleanupContactForCreate,
-  defaultEmailJsonb,
-  defaultPhoneJsonb,
+  getContactCreateDefaults,
 } from "./contactModel";
 
 export interface ContactCreateSheetProps {
@@ -22,11 +21,7 @@ export const ContactCreateSheet = ({
     <CreateSheet
       resource="contacts"
       title={translate("resources.contacts.action.new")}
-      defaultValues={{
-        sales_id: identity?.id,
-        email_jsonb: defaultEmailJsonb,
-        phone_jsonb: defaultPhoneJsonb,
-      }}
+      defaultValues={getContactCreateDefaults(identity?.id)}
       transform={cleanupContactForCreate}
       open={open}
       onOpenChange={onOpenChange}

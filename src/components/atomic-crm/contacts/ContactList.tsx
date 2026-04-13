@@ -29,53 +29,28 @@ import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { ContactListContentMobile } from "./ContactListContent";
 import { EditableCell } from "./EditableCell";
-import { isoToDisplay, displayToIso } from "./contactModel";
+import {
+  isoToDisplay,
+  displayToIso,
+  toMaskedCurrency,
+  parseCurrencyField,
+} from "./contactModel";
 import {
   maskPhone,
   maskCPF,
   maskCNPJ,
   maskDate,
   maskCurrency,
-  unmaskCurrency,
 } from "./utils/masks";
-
-// ─── Choices for select fields ────────────────────────────────────────────────
-
-const SEGMENT_CHOICES = [
-  { id: "Digital", name: "Digital" },
-  { id: "Exclusive", name: "Exclusive" },
-  { id: "Signature", name: "Signature" },
-  { id: "Unique", name: "Unique" },
-  { id: "Private", name: "Private" },
-];
-
-const INVESTOR_PROFILE_CHOICES = [
-  { id: "Regular", name: "Regular" },
-  { id: "Qualificado", name: "Qualificado" },
-  { id: "Profissional", name: "Profissional" },
-];
-
-const XP_ACCOUNT_TYPE_CHOICES = [
-  { id: "Assessorado", name: "Assessorado" },
-  { id: "Autônomo", name: "Autônomo" },
-  { id: "Institucional", name: "Institucional" },
-];
-
-const BRAZIL_STATE_CHOICES = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
-].map((s) => ({ id: s, name: s }));
-
-// ─── Currency helpers ─────────────────────────────────────────────────────────
-
-const formatCurrencyBRL = (value: number | null | undefined) =>
-  value != null
-    ? new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(value)
-    : null;
+import {
+  BRAZIL_STATE_CHOICES,
+  flattenEmailJsonb,
+  flattenPhoneJsonb,
+  formatCurrencyBRL,
+  INVESTOR_PROFILE_CHOICES,
+  SEGMENT_CHOICES,
+  XP_ACCOUNT_TYPE_CHOICES,
+} from "./contactFieldConfig";
 
 // ─── Sticky column classes ────────────────────────────────────────────────────
 
@@ -143,10 +118,7 @@ const ContactListLayoutDesktop = () => {
             <DataTable.Col
               source="last_name"
               render={(r: Contact) => (
-                <EditableCell
-                  source="last_name"
-                  config={{ inputType: "text" }}
-                >
+                <EditableCell source="last_name" config={{ inputType: "text" }}>
                   {r.last_name}
                 </EditableCell>
               )}
@@ -313,15 +285,8 @@ const ContactListLayoutDesktop = () => {
                   config={{
                     inputType: "text",
                     maskFn: maskCurrency,
-                    toInput: (v) => {
-                      if (v == null) return "";
-                      const cents = Math.round(Number(v) * 100);
-                      return maskCurrency(String(cents));
-                    },
-                    toSave: (v) => {
-                      const num = unmaskCurrency(v);
-                      return num ? parseFloat(num) : null;
-                    },
+                    toInput: (v) => toMaskedCurrency(v as number | null),
+                    toSave: (v) => parseCurrencyField(v),
                   }}
                 >
                   {formatCurrencyBRL(r.declared_wealth)}
@@ -472,21 +437,10 @@ const exporter: Exporter<Contact> = async (records, fetchRelatedRecords) => {
         sales[contact.sales_id].last_name
       }`,
       tags: contact.tags.map((tagId) => tags[tagId].name).join(", "),
-      email_work: contact.email_jsonb?.find((email) => email.type === "Work")
-        ?.email,
-      email_home: contact.email_jsonb?.find((email) => email.type === "Home")
-        ?.email,
-      email_other: contact.email_jsonb?.find((email) => email.type === "Other")
-        ?.email,
+      ...flattenEmailJsonb(contact.email_jsonb),
       email_jsonb: JSON.stringify(contact.email_jsonb),
       email_fts: undefined,
-      phone_work: contact.phone_jsonb?.find((phone) => phone.type === "Work")
-        ?.number,
-      phone_home: contact.phone_jsonb?.find((phone) => phone.type === "Home")
-        ?.number,
-      phone_other: contact.phone_jsonb?.find(
-        (phone) => phone.type === "Other",
-      )?.number,
+      ...flattenPhoneJsonb(contact.phone_jsonb),
       phone_jsonb: JSON.stringify(contact.phone_jsonb),
       phone_fts: undefined,
     };

@@ -2,6 +2,7 @@ import { useDataProvider, useGetIdentity, type DataProvider } from "ra-core";
 import { useCallback, useMemo } from "react";
 
 import type { Company, Tag } from "../types";
+import { structureEmailJsonb, structurePhoneJsonb } from "./contactFieldConfig";
 
 export type ContactImportSchema = {
   first_name: string;
@@ -168,16 +169,16 @@ export function useContactImport() {
             country,
             address_notes,
           }) => {
-            const email_jsonb = [
-              { email: email_work, type: "Work" },
-              { email: email_home, type: "Home" },
-              { email: email_other, type: "Other" },
-            ].filter(({ email }) => email);
-            const phone_jsonb = [
-              { number: phone_work, type: "Work" },
-              { number: phone_home, type: "Home" },
-              { number: phone_other, type: "Other" },
-            ].filter(({ number }) => number);
+            const email_jsonb = structureEmailJsonb({
+              email_work,
+              email_home,
+              email_other,
+            });
+            const phone_jsonb = structurePhoneJsonb({
+              phone_work,
+              phone_home,
+              phone_other,
+            });
             const company = companyName?.trim()
               ? companies.get(companyName.trim())
               : undefined;

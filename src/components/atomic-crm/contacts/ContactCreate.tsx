@@ -6,8 +6,8 @@ import { ContactInputs } from "./ContactInputs";
 import { FormToolbar } from "../layout/FormToolbar";
 import {
   cleanupContactForCreate,
-  defaultEmailJsonb,
-  defaultPhoneJsonb,
+  CONTACT_FORM_MODE,
+  getContactCreateDefaults,
   validateContactForm,
 } from "./contactModel";
 
@@ -16,11 +16,6 @@ const preventEnterSubmit = (e: React.KeyboardEvent) => {
     e.preventDefault();
   }
 };
-
-const todayDisplay = (() => {
-  const d = new Date();
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-})();
 
 export const ContactCreate = ({
   mutationMode = "pessimistic",
@@ -39,16 +34,8 @@ export const ContactCreate = ({
         <div className="flex-1">
           <Form
             validate={validateContactForm}
-            mode="onBlur"
-            defaultValues={{
-              sales_id: identity?.id,
-              email_jsonb: defaultEmailJsonb,
-              phone_jsonb: defaultPhoneJsonb,
-              country: "Brasil",
-              person_type: "PF",
-              cross_sell_opportunities: [],
-              relationship_start_date: todayDisplay,
-            }}
+            mode={CONTACT_FORM_MODE}
+            defaultValues={getContactCreateDefaults(identity?.id)}
           >
             <Card>
               <CardContent>

@@ -61,53 +61,22 @@ import {
   cpfValidator,
   dateValidator,
   phoneValidator,
+  validateEmail,
   validatePhone,
 } from "./utils/validations";
 import { searchCEP } from "./utils/cep";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const BRAZIL_STATES = [
-  "AC",
-  "AL",
-  "AP",
-  "AM",
-  "BA",
-  "CE",
-  "DF",
-  "ES",
-  "GO",
-  "MA",
-  "MT",
-  "MS",
-  "MG",
-  "PA",
-  "PB",
-  "PR",
-  "PE",
-  "PI",
-  "RJ",
-  "RN",
-  "RS",
-  "RO",
-  "RR",
-  "SC",
-  "SP",
-  "SE",
-  "TO",
-];
-
-const CROSS_SELL_OPTIONS = [
-  "Banking",
-  "Cartão de Crédito",
-  "Previdência",
-  "Seguro de Vida",
-  "Plano de Saúde",
-  "Consórcio",
-  "Crédito/Financiamento",
-  "Offshore",
-  "Outro",
-];
+import {
+  BRAZIL_STATE_CHOICES,
+  CROSS_SELL_OPTIONS,
+  FINANCIAL_GOAL_CHOICES,
+  INVESTMENT_HORIZON_CHOICES,
+  INVESTOR_PROFILE_CHOICES,
+  ORIGIN_CHOICES,
+  PERSON_TYPE_CHOICES,
+  SEGMENT_CHOICES,
+  XP_ACCOUNT_TYPE_CHOICES,
+  XP_INTERNATIONAL_CHOICES,
+} from "./contactFieldConfig";
 
 // Fields belonging to each tab — used to auto-switch tab on validation error
 const TAB_FIELDS: Record<string, string[]> = {
@@ -402,10 +371,7 @@ const Tab1PersonalInfo = () => {
         <SelectInput
           source="person_type"
           label="resources.contacts.fields.person_type"
-          choices={[
-            { id: "PF", name: "Pessoa Física (PF)" },
-            { id: "PJ", name: "Pessoa Jurídica (PJ)" },
-          ]}
+          choices={PERSON_TYPE_CHOICES}
           validate={!isProspect ? required() : undefined}
           helperText={false}
           onChange={handlePersonTypeChange}
@@ -500,7 +466,7 @@ const ProspectContactAlert = () => {
     (p: { number?: string }) => p.number && validatePhone(p.number),
   );
   const hasValidEmail = emailJsonb?.some(
-    (e: { email?: string }) => e.email && /\S+@\S+\.\S+/.test(e.email),
+    (e: { email?: string }) => e.email && validateEmail(e.email),
   );
 
   if (isProspect) {
@@ -551,23 +517,13 @@ const Tab2InvestorProfile = () => {
         <SelectInput
           source="segment"
           label="resources.contacts.fields.segment"
-          choices={[
-            { id: "Digital", name: "Digital" },
-            { id: "Exclusive", name: "Exclusive" },
-            { id: "Signature", name: "Signature" },
-            { id: "Unique", name: "Unique" },
-            { id: "Private", name: "Private" },
-          ]}
+          choices={SEGMENT_CHOICES}
           helperText={false}
         />
         <SelectInput
           source="investor_profile"
           label="resources.contacts.fields.investor_profile"
-          choices={[
-            { id: "Regular", name: "Regular" },
-            { id: "Qualificado", name: "Qualificado" },
-            { id: "Profissional", name: "Profissional" },
-          ]}
+          choices={INVESTOR_PROFILE_CHOICES}
           helperText={false}
         />
       </div>
@@ -584,11 +540,7 @@ const Tab2InvestorProfile = () => {
         <SelectInput
           source="xp_account_type"
           label="resources.contacts.fields.xp_account_type"
-          choices={[
-            { id: "Assessorado", name: "Assessorado" },
-            { id: "Autônomo", name: "Autônomo" },
-            { id: "Institucional", name: "Institucional" },
-          ]}
+          choices={XP_ACCOUNT_TYPE_CHOICES}
           helperText={false}
         />
       </div>
@@ -598,20 +550,13 @@ const Tab2InvestorProfile = () => {
         <SelectInput
           source="xp_international"
           label="resources.contacts.fields.xp_international"
-          choices={[
-            { id: "true", name: "Sim" },
-            { id: "false", name: "Não" },
-          ]}
+          choices={XP_INTERNATIONAL_CHOICES}
           helperText={false}
         />
         <SelectInput
           source="investment_horizon"
           label="resources.contacts.fields.investment_horizon"
-          choices={[
-            { id: "Curto Prazo", name: "Curto Prazo" },
-            { id: "Médio Prazo", name: "Médio Prazo" },
-            { id: "Longo Prazo", name: "Longo Prazo" },
-          ]}
+          choices={INVESTMENT_HORIZON_CHOICES}
           helperText={false}
         />
       </div>
@@ -621,13 +566,7 @@ const Tab2InvestorProfile = () => {
         <SelectInput
           source="financial_goal"
           label="resources.contacts.fields.financial_goal"
-          choices={[
-            { id: "Aposentadoria", name: "Aposentadoria" },
-            { id: "Preservação de Capital", name: "Preservação de Capital" },
-            { id: "Crescimento", name: "Crescimento" },
-            { id: "Renda Passiva", name: "Renda Passiva" },
-            { id: "Outro", name: "Outro" },
-          ]}
+          choices={FINANCIAL_GOAL_CHOICES}
           helperText={false}
         />
         <MaskedTextInput
@@ -679,13 +618,7 @@ const Tab2InvestorProfile = () => {
         <SelectInput
           source="origin"
           label="resources.contacts.fields.origin"
-          choices={[
-            { id: "Indicação", name: "Indicação" },
-            { id: "Prospecção", name: "Prospecção" },
-            { id: "Campanha", name: "Campanha" },
-            { id: "Evento", name: "Evento" },
-            { id: "Outro", name: "Outro" },
-          ]}
+          choices={ORIGIN_CHOICES}
           helperText={false}
         />
         <TextInput
@@ -762,8 +695,6 @@ const Tab3Address = () => {
     }
   };
 
-  const stateChoices = BRAZIL_STATES.map((uf) => ({ id: uf, name: uf }));
-
   return (
     <div className="flex flex-col gap-4 p-1">
       {/* CEP com botão busca */}
@@ -836,7 +767,7 @@ const Tab3Address = () => {
         <SelectInput
           source="state"
           label="resources.contacts.fields.state"
-          choices={stateChoices}
+          choices={BRAZIL_STATE_CHOICES}
           helperText={false}
         />
         <TextInput

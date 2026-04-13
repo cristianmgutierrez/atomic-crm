@@ -104,3 +104,7 @@ export const dateValidator = (value: string | undefined) => {
   if (!value) return undefined;
   return validateDate(value) ? undefined : "Data inválida";
 };
+
+/** Validate basic email format */
+export const validateEmail = (email: string): boolean =>
+  /\S+@\S+\.\S+/.test(email);

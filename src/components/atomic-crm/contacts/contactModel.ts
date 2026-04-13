@@ -7,7 +7,7 @@ import {
   validateCNPJ,
   validateDate,
 } from "./utils/validations";
-import { unmaskCurrency } from "./utils/masks";
+import { maskCurrency, unmaskCurrency } from "./utils/masks";
 
 /** Convert ISO date (YYYY-MM-DD) to display format (DD/MM/AAAA) */
 export const isoToDisplay = (
@@ -30,7 +30,7 @@ export const displayToIso = (
 export const defaultEmailJsonb = [{ email: null, type: null }];
 export const defaultPhoneJsonb = [{ number: null, type: null }];
 
-const parseCurrencyField = (
+export const parseCurrencyField = (
   value: string | number | null | undefined,
 ): number | null => {
   if (value == null || value === "") return null;
@@ -66,6 +66,51 @@ export const cleanupContactForCreate = (data: Contact) => {
 };
 
 export const cleanupContactForEdit = cleanContactArrayFields;
+
+// ─── Form config ──────────────────────────────────────────────────────────────
+
+/** Validation mode for all contact forms. */
+export const CONTACT_FORM_MODE = "onBlur" as const;
+
+/** Number (DB) → masked currency string for form input display (e.g. "R$ 6.000,00"). */
+export const toMaskedCurrency = (
+  v: number | string | null | undefined,
+): string => {
+  if (v == null || v === "") return "";
+  const num = typeof v === "string" ? parseFloat(v) : v;
+  if (isNaN(num)) return "";
+  return maskCurrency(Math.round(num * 100).toString());
+};
+
+/** Normalize a record loaded from the DB for form display. */
+export const normalizeContactArrayFields = (record: Contact) => ({
+  ...record,
+  email_jsonb:
+    record.email_jsonb && record.email_jsonb.length > 0
+      ? record.email_jsonb
+      : defaultEmailJsonb,
+  phone_jsonb:
+    record.phone_jsonb && record.phone_jsonb.length > 0
+      ? record.phone_jsonb
+      : defaultPhoneJsonb,
+  // Convert ISO dates → display format
+  date_of_birth: isoToDisplay(record.date_of_birth),
+  relationship_start_date: isoToDisplay(record.relationship_start_date),
+  // Convert numeric DB values → masked currency strings for form inputs
+  monthly_income: toMaskedCurrency(record.monthly_income),
+  declared_wealth: toMaskedCurrency(record.declared_wealth),
+});
+
+/** Default values for new contact forms. */
+export const getContactCreateDefaults = (salesId?: string | number) => ({
+  sales_id: salesId,
+  email_jsonb: defaultEmailJsonb,
+  phone_jsonb: defaultPhoneJsonb,
+  country: "Brasil",
+  person_type: "PF",
+  cross_sell_opportunities: [],
+  relationship_start_date: isoToDisplay(new Date().toISOString().split("T")[0]),
+});
 
 /** Form-level validator: enforces required fields by contact status. */
 export const validateContactForm = (values: Contact) => {
