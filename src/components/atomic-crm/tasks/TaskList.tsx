@@ -18,9 +18,9 @@ import { TopToolbar } from "../layout/TopToolbar";
 import { AddTask } from "./AddTask";
 import { TaskEdit } from "./TaskEdit";
 import { TaskPageFilter } from "./TaskPageFilter";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
 import { isOverdue, isDueToday } from "./tasksPredicate";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { formatTimeRange, getTaskTypeWithIcon } from "./taskModel";
 
 // ─── Actions toolbar ──────────────────────────────────────────────────────────
 
@@ -59,12 +59,11 @@ const DoneCheckbox = ({ task }: { task: Task }) => {
 
 const TypeIconCell = ({ task }: { task: Task }) => {
   const { taskTypes } = useConfigurationContext();
-  const matchedType = taskTypes.find((t) => t.value === task.type);
-  const Icon = getTaskTypeIcon(matchedType?.icon);
+  const { taskType, Icon } = getTaskTypeWithIcon(taskTypes, task.type);
   return (
     <div className="flex items-center gap-1.5">
       <Icon className="h-4 w-4 shrink-0" />
-      <span className="text-xs hidden lg:inline">{matchedType?.label}</span>
+      <span className="text-xs hidden lg:inline">{taskType?.label}</span>
     </div>
   );
 };
@@ -72,10 +71,7 @@ const TypeIconCell = ({ task }: { task: Task }) => {
 // ─── Time cell ────────────────────────────────────────────────────────────────
 
 const TimeCell = ({ task }: { task: Task }) => {
-  const display =
-    task.start_time || task.end_time
-      ? [task.start_time, task.end_time].filter(Boolean).join(" - ")
-      : "—";
+  const display = formatTimeRange(task.start_time, task.end_time) ?? "—";
   return <span className="text-xs">{display}</span>;
 };
 

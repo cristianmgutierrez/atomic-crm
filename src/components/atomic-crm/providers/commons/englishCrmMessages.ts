@@ -358,6 +358,22 @@ export const englishCrmMessages = {
       },
       regarding_contact: "(Re: %{name})",
       updated: "Task updated",
+      inputs: {
+        text: "Description",
+        type: "Type",
+        due_date: "Start date",
+        end_date: "End date",
+        start_time: "Start",
+        end_time: "End",
+        notes: "Notes",
+        notes_placeholder: "Add a note...",
+        deal_id: "Deal",
+        contact_id: "Contact",
+      },
+      validation: {
+        end_date_before_start: "End date cannot be before start date",
+        end_time_before_start: "End time must be after start time",
+      },
     },
     tags: {
       name: "Tag |||| Tags",

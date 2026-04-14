@@ -1,5 +1,4 @@
 import { Plus } from "lucide-react";
-import { format } from "date-fns";
 import {
   CreateBase,
   Form,
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 
 import { TaskFormContent } from "./TaskFormContent";
+import { getTaskCreateDefaults } from "./taskModel";
 
 export const AddTask = ({
   selectContact,
@@ -103,13 +103,7 @@ export const AddTask = ({
 
       <CreateBase
         resource="tasks"
-        record={{
-          type: "call",
-          contact_id: contact?.id,
-          due_date: format(new Date(), "yyyy-MM-dd"),
-          end_date: format(new Date(), "yyyy-MM-dd"),
-          sales_id: identity.id,
-        }}
+        record={getTaskCreateDefaults(identity.id, contact?.id)}
         mutationOptions={{ onSuccess: handleSuccess }}
       >
         <Dialog open={open} onOpenChange={() => setOpen(false)}>

@@ -5,7 +5,7 @@ import { TextInput } from "@/components/admin/text-input";
 import { DatePickerInput } from "@/components/admin/date-picker-input";
 import { TimePickerSelect } from "@/components/admin/time-picker-select";
 import { RichTextInput } from "@/components/admin/rich-text-input";
-import { required, useGetOne } from "ra-core";
+import { required, useGetOne, useTranslate } from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { contactOptionText } from "../misc/ContactOption";
@@ -23,6 +23,7 @@ function addSixtyMinutes(time: string): string | null {
 }
 
 export const TaskFormContent = () => {
+  const translate = useTranslate();
   const { setValue, getValues } = useFormContext();
   const dealId = useWatch({ name: "deal_id" });
   const dueDate = useWatch({ name: "due_date" });
@@ -40,11 +41,11 @@ export const TaskFormContent = () => {
       if (!value) return undefined;
       const dd = getValues("due_date");
       if (dd && value < dd) {
-        return "Data fim não pode ser anterior à data início";
+        return translate("resources.tasks.validation.end_date_before_start");
       }
       return undefined;
     },
-    [getValues],
+    [getValues, translate],
   );
 
   const validateEndTime = useCallback(
@@ -54,11 +55,11 @@ export const TaskFormContent = () => {
       const dd = getValues("due_date");
       const ed = getValues("end_date");
       if (st && dd && ed && dd === ed && value <= st) {
-        return "Hora fim deve ser posterior à hora início";
+        return translate("resources.tasks.validation.end_time_before_start");
       }
       return undefined;
     },
-    [getValues],
+    [getValues, translate],
   );
 
   const { data: deal } = useGetOne<Deal>(
@@ -95,7 +96,9 @@ export const TaskFormContent = () => {
   // Local validation: compute error message from watched values
   useEffect(() => {
     if (endDate && dueDate && endDate < dueDate) {
-      setDateTimeError("Data fim não pode ser anterior à data início");
+      setDateTimeError(
+        translate("resources.tasks.validation.end_date_before_start"),
+      );
     } else if (
       endTime &&
       startTime &&
@@ -104,7 +107,9 @@ export const TaskFormContent = () => {
       dueDate === endDate &&
       endTime <= startTime
     ) {
-      setDateTimeError("Hora fim deve ser posterior à hora início");
+      setDateTimeError(
+        translate("resources.tasks.validation.end_time_before_start"),
+      );
     } else {
       setDateTimeError(null);
     }
@@ -115,7 +120,7 @@ export const TaskFormContent = () => {
       <TextInput
         autoFocus
         source="text"
-        label="Descricao"
+        label={translate("resources.tasks.inputs.text")}
         validate={required()}
         className="m-0"
         helperText={false}
@@ -123,7 +128,7 @@ export const TaskFormContent = () => {
 
       <TaskTypeIconBar
         source="type"
-        label="Tipo"
+        label={translate("resources.tasks.inputs.type")}
         validate={required()}
         defaultValue="call"
       />
@@ -132,7 +137,7 @@ export const TaskFormContent = () => {
         <div className="grid grid-cols-[1fr_auto_auto_1fr] gap-2 items-end">
           <DatePickerInput
             source="due_date"
-            label="Data inicio"
+            label={translate("resources.tasks.inputs.due_date")}
             helperText={false}
             validate={required()}
           />
@@ -140,21 +145,21 @@ export const TaskFormContent = () => {
             source="start_time"
             label={false}
             helperText={false}
-            placeholder="Inicio"
+            placeholder={translate("resources.tasks.inputs.start_time")}
             clearable
           />
           <TimePickerSelect
             source="end_time"
             label={false}
             helperText={false}
-            placeholder="Fim"
+            placeholder={translate("resources.tasks.inputs.end_time")}
             clearable
             validate={validateEndTime}
             className="[&_[data-slot=form-message]]:hidden"
           />
           <DatePickerInput
             source="end_date"
-            label="Data fim"
+            label={translate("resources.tasks.inputs.end_date")}
             helperText={false}
             validate={validateEndDate}
             className="[&_[data-slot=form-message]]:hidden"
@@ -167,14 +172,14 @@ export const TaskFormContent = () => {
 
       <RichTextInput
         source="notes"
-        label="Anotacao"
+        label={translate("resources.tasks.inputs.notes")}
         helperText={false}
-        placeholder="Adicionar anotacao..."
+        placeholder={translate("resources.tasks.inputs.notes_placeholder")}
       />
 
       <ReferenceInput source="deal_id" reference="deals">
         <AutocompleteInput
-          label="Negocio"
+          label={translate("resources.tasks.inputs.deal_id")}
           optionText="name"
           helperText={false}
         />
@@ -182,7 +187,7 @@ export const TaskFormContent = () => {
 
       <ReferenceInput source="contact_id" reference="contacts_summary">
         <AutocompleteInput
-          label="Contato"
+          label={translate("resources.tasks.inputs.contact_id")}
           optionText={contactOptionText}
           helperText={false}
           validate={required()}

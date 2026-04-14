@@ -395,6 +395,22 @@ export const portugueseBrazilianCrmMessages = {
       },
       regarding_contact: "(Re: %{name})",
       updated: "Tarefa atualizada",
+      inputs: {
+        text: "Descrição",
+        type: "Tipo",
+        due_date: "Data início",
+        end_date: "Data fim",
+        start_time: "Início",
+        end_time: "Fim",
+        notes: "Anotação",
+        notes_placeholder: "Adicionar anotação...",
+        deal_id: "Negócio",
+        contact_id: "Contato",
+      },
+      validation: {
+        end_date_before_start: "Data fim não pode ser anterior à data início",
+        end_time_before_start: "Hora fim deve ser posterior à hora início",
+      },
     },
     tags: {
       name: "Etiqueta |||| Etiquetas",

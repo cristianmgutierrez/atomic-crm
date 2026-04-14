@@ -11,6 +11,7 @@ import {
 import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "../notes/foreignKeyMapping";
 import { TaskFormContent } from "./TaskFormContent";
+import { getTaskCreateDefaults } from "./taskModel";
 import { useQueryClient } from "@tanstack/react-query";
 
 export interface TaskCreateSheetProps {
@@ -75,13 +76,7 @@ export const TaskCreateSheet = ({
         </span>
       }
       redirect={false}
-      record={{
-        type: "call",
-        contact_id,
-        due_date: new Date().toISOString().slice(0, 10),
-        end_date: new Date().toISOString().slice(0, 10),
-        sales_id: identity.id,
-      }}
+      record={getTaskCreateDefaults(identity.id, contact_id)}
       mutationOptions={{
         onSuccess: handleSuccess,
       }}

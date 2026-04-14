@@ -354,6 +354,24 @@ export const frenchCrmMessages = {
       },
       regarding_contact: "(Concernant : %{name})",
       updated: "Tâche mise à jour",
+      inputs: {
+        text: "Description",
+        type: "Type",
+        due_date: "Date début",
+        end_date: "Date fin",
+        start_time: "Début",
+        end_time: "Fin",
+        notes: "Notes",
+        notes_placeholder: "Ajouter une note...",
+        deal_id: "Affaire",
+        contact_id: "Contact",
+      },
+      validation: {
+        end_date_before_start:
+          "La date de fin ne peut pas être antérieure à la date de début",
+        end_time_before_start:
+          "L'heure de fin doit être postérieure à l'heure de début",
+      },
     },
     tags: {
       name: "Étiquette |||| Étiquettes",

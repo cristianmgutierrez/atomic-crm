@@ -24,7 +24,7 @@ import type { Contact, Deal, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { formatTimeRange, getTaskTypeWithIcon } from "./taskModel";
 
 export const Task = ({
   task,
@@ -90,16 +90,10 @@ export const Task = ({
   const labelId = `checkbox-list-label-${task.id}`;
 
   // Find the matching task type for icon display
-  const matchedTaskType = taskTypes.find(
-    (taskType) => taskType.value === task.type,
-  );
-  const TypeIcon = getTaskTypeIcon(matchedTaskType?.icon);
+  const { Icon: TypeIcon } = getTaskTypeWithIcon(taskTypes, task.type);
 
   // Format time display
-  const timeDisplay =
-    task.start_time || task.end_time
-      ? [task.start_time, task.end_time].filter(Boolean).join(" - ")
-      : null;
+  const timeDisplay = formatTimeRange(task.start_time, task.end_time);
 
   return (
     <>
