@@ -6,6 +6,7 @@ import {
   validateCPF,
   validateCNPJ,
   validateDate,
+  checkDocumentUnique,
 } from "./utils/validations";
 import { maskCurrency, unmaskCurrency } from "./utils/masks";
 
@@ -113,7 +114,7 @@ export const getContactCreateDefaults = (salesId?: string | number) => ({
 });
 
 /** Form-level validator: enforces required fields by contact status. */
-export const validateContactForm = (values: Contact) => {
+export const validateContactForm = async (values: Contact) => {
   const errors: Record<string, string> = {};
   const isProspect = values.status === "prospect";
 
@@ -149,9 +150,11 @@ export const validateContactForm = (values: Contact) => {
     if (!values.document?.trim()) {
       errors.document = "ra.validation.required";
     } else if (values.person_type === "PJ") {
-      if (!validateCNPJ(values.document)) errors.document = "CNPJ inválido";
+      if (!validateCNPJ(values.document))
+        errors.document = "crm.validation.invalid_cnpj";
     } else {
-      if (!validateCPF(values.document)) errors.document = "CPF inválido";
+      if (!validateCPF(values.document))
+        errors.document = "crm.validation.invalid_cpf";
     }
 
     if (values.person_type !== "PJ") {
@@ -164,6 +167,14 @@ export const validateContactForm = (values: Contact) => {
 
     if (!values.xp_code?.trim()) errors.xp_code = "ra.validation.required";
     if (!values.segment) errors.segment = "ra.validation.required";
+  }
+
+  // Uniqueness check — runs for any contact with a valid-format document
+  if (values.document?.trim() && !errors.document) {
+    const isUnique = await checkDocumentUnique(values.document, values.id);
+    if (!isUnique) {
+      errors.document = "crm.validation.document_already_registered";
+    }
   }
 
   return errors;

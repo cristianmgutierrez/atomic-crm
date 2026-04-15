@@ -627,6 +627,13 @@ export const portugueseBrazilianCrmMessages = {
       invalid_url: "Deve ser uma URL válida",
       invalid_linkedin_url: "A URL deve ser do linkedin.com",
       invalid_instagram_handle: "Instagram inválido (ex: @usuario ou usuario)",
+      invalid_cpf: "CPF inválido",
+      invalid_cnpj: "CNPJ inválido",
+      document_already_registered: "CPF/CNPJ já cadastrado para outro contato",
+      invalid_phone: "Telefone inválido",
+      invalid_email: "E-mail inválido",
+      invalid_date: "Data inválida",
+      save_error: "Erro ao salvar",
     },
   },
 } satisfies CrmMessages;

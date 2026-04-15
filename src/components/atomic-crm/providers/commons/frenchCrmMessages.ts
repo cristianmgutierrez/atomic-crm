@@ -589,6 +589,16 @@ export const frenchCrmMessages = {
     validation: {
       invalid_url: "Doit être une URL valide",
       invalid_linkedin_url: "L'URL doit provenir de linkedin.com",
+      invalid_instagram_handle:
+        "Identifiant Instagram invalide (ex : @utilisateur ou utilisateur)",
+      invalid_cpf: "CPF invalide",
+      invalid_cnpj: "CNPJ invalide",
+      document_already_registered:
+        "CPF/CNPJ déjà enregistré pour un autre contact",
+      invalid_phone: "Numéro de téléphone invalide",
+      invalid_email: "E-mail invalide",
+      invalid_date: "Date invalide",
+      save_error: "Erreur lors de l'enregistrement",
     },
   },
 } satisfies CrmMessages;

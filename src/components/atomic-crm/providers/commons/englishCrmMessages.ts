@@ -592,6 +592,14 @@ export const englishCrmMessages = {
       invalid_linkedin_url: "URL must be from linkedin.com",
       invalid_instagram_handle:
         "Invalid Instagram handle (e.g. @username or username)",
+      invalid_cpf: "Invalid CPF",
+      invalid_cnpj: "Invalid CNPJ",
+      document_already_registered:
+        "CPF/CNPJ already registered for another contact",
+      invalid_phone: "Invalid phone number",
+      invalid_email: "Invalid email",
+      invalid_date: "Invalid date",
+      save_error: "Error saving",
     },
   },
 } as const;

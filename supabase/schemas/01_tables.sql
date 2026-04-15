@@ -84,7 +84,8 @@ create table public.contacts (
     city text,
     state text,
     country text,
-    address_notes text
+    address_notes text,
+    constraint contacts_document_unique unique (document)
 );
 
 create table public.contact_notes (

@@ -3,6 +3,7 @@
  * Compatible with ra-core validators: (value, allValues?) => string | undefined
  */
 
+import { getSupabaseClient } from "../../providers/supabase/supabase";
 import { unmaskDigits } from "./masks";
 
 /** Validate CPF using modulo-11 algorithm */
@@ -108,3 +109,26 @@ export const dateValidator = (value: string | undefined) => {
 /** Validate basic email format */
 export const validateEmail = (email: string): boolean =>
   /\S+@\S+\.\S+/.test(email);
+
+/**
+ * Checks if a document (CPF/CNPJ) is already registered for another contact.
+ * @returns true if a duplicate exists, false otherwise.
+ */
+export const checkDocumentUnique = async (
+  document: string,
+  currentId?: number | string,
+): Promise<boolean> => {
+  const supabase = getSupabaseClient();
+  let query = supabase
+    .from("contacts")
+    .select("id")
+    .eq("document", document)
+    .limit(1);
+
+  if (currentId) {
+    query = query.neq("id", currentId);
+  }
+
+  const { data } = await query;
+  return !data || data.length === 0;
+};

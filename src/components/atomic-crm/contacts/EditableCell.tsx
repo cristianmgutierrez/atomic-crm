@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRecordContext, useUpdate } from "ra-core";
+import { useRecordContext, useTranslate, useUpdate } from "ra-core";
 import { Check, Copy, Pencil } from "lucide-react";
 import {
   Popover,
@@ -26,6 +26,11 @@ export type EditableCellConfig = {
   toSave?: (inputValue: string) => unknown;
   /** For complex fields (JSONB arrays), provide the full data object to save */
   getSaveData?: (record: Contact, inputValue: string) => Partial<Contact>;
+  /** Client-side validator: returns an i18n key on error, undefined if valid. Can be async. */
+  validate?: (
+    value: string,
+    record: Contact,
+  ) => string | undefined | Promise<string | undefined>;
 } & (
   | { inputType: "text" }
   | { inputType: "select"; choices: { id: string; name: string }[] }
@@ -47,6 +52,7 @@ export const EditableCell = ({
 }: EditableCellProps) => {
   const record = useRecordContext<Contact>();
   const [update, { isPending }] = useUpdate();
+  const translate = useTranslate();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -76,7 +82,15 @@ export const EditableCell = ({
     setOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (config.validate) {
+      const error = await config.validate(inputValue, record);
+      if (error) {
+        setSaveError(translate(error, { _: error }));
+        return;
+      }
+    }
+
     let saveData: Partial<Contact>;
     if (config.getSaveData) {
       saveData = config.getSaveData(record, inputValue);
@@ -97,8 +111,21 @@ export const EditableCell = ({
           setOpen(false);
           setSaveError(null);
         },
-        onError: () => {
-          setSaveError("Erro ao salvar");
+        onError: (error: any) => {
+          const msg = error?.body?.message ?? "";
+          if (msg.includes("contacts_document_unique")) {
+            setSaveError(
+              translate("crm.validation.document_already_registered", {
+                _: "CPF/CNPJ já cadastrado para outro contato",
+              }),
+            );
+          } else {
+            setSaveError(
+              translate("crm.validation.save_error", {
+                _: "Erro ao salvar",
+              }),
+            );
+          }
         },
       },
     );

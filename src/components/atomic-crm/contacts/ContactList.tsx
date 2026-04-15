@@ -51,6 +51,14 @@ import {
   SEGMENT_CHOICES,
   XP_ACCOUNT_TYPE_CHOICES,
 } from "./contactFieldConfig";
+import {
+  checkDocumentUnique,
+  validateCNPJ,
+  validateCPF,
+  validateDate,
+  validateEmail,
+  validatePhone,
+} from "./utils/validations";
 
 // ─── Sticky column classes ────────────────────────────────────────────────────
 
@@ -158,6 +166,12 @@ const ContactListLayoutDesktop = () => {
                             ]
                           : [{ number: val, type: "Work" }],
                     }),
+                    validate: (val) => {
+                      if (!val) return undefined;
+                      return validatePhone(val)
+                        ? undefined
+                        : "crm.validation.invalid_phone";
+                    },
                   }}
                   copyValue={r.phone_jsonb?.[0]?.number}
                 >
@@ -185,6 +199,12 @@ const ContactListLayoutDesktop = () => {
                             ]
                           : [{ email: val, type: "Work" }],
                     }),
+                    validate: (val) => {
+                      if (!val) return undefined;
+                      return validateEmail(val)
+                        ? undefined
+                        : "crm.validation.invalid_email";
+                    },
                   }}
                   copyValue={r.email_jsonb?.[0]?.email}
                 >
@@ -202,6 +222,24 @@ const ContactListLayoutDesktop = () => {
                   config={{
                     inputType: "text",
                     maskFn: r.person_type === "PJ" ? maskCNPJ : maskCPF,
+                    validate: async (val, record) => {
+                      if (!val) return undefined;
+                      const isPJ = record.person_type === "PJ";
+                      const isValid = isPJ
+                        ? validateCNPJ(val)
+                        : validateCPF(val);
+                      if (!isValid)
+                        return isPJ
+                          ? "crm.validation.invalid_cnpj"
+                          : "crm.validation.invalid_cpf";
+                      const isUnique = await checkDocumentUnique(
+                        val,
+                        record.id,
+                      );
+                      if (!isUnique)
+                        return "crm.validation.document_already_registered";
+                      return undefined;
+                    },
                   }}
                   copyValue={r.document}
                 >
@@ -235,6 +273,12 @@ const ContactListLayoutDesktop = () => {
                     maskFn: maskDate,
                     toInput: (v) => isoToDisplay(v as string) ?? "",
                     toSave: (v) => displayToIso(v) ?? null,
+                    validate: (val) => {
+                      if (!val) return undefined;
+                      return validateDate(val)
+                        ? undefined
+                        : "crm.validation.invalid_date";
+                    },
                   }}
                 >
                   {isoToDisplay(r.date_of_birth)}
