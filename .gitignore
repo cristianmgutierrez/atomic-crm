@@ -5,6 +5,9 @@
 *.iml
 .vscode/
 
+# design reference files (local only)
+reference/
+
 # dependencies
 /node_modules
 
