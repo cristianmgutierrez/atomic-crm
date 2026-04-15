@@ -99,7 +99,7 @@ export function useContactImport() {
         names,
         (name) => ({
           name,
-          color: "#f9f9f9",
+          color: "#3a6b5e",
         }),
         dataProvider,
       ),

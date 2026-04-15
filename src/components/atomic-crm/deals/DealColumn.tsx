@@ -38,7 +38,7 @@ export const DealColumn = ({
             ref={droppableProvided.innerRef}
             {...droppableProvided.droppableProps}
             className={`flex flex-col rounded-2xl mt-2 gap-2 ${
-              snapshot.isDraggingOver ? "bg-muted" : ""
+              snapshot.isDraggingOver ? "bg-accent/10" : ""
             }`}
           >
             {deals.map((deal, index) => (

@@ -42,7 +42,7 @@ export const CreateButton = ({
   });
   return (
     <Link
-      className={buttonVariants({ variant: "outline" })}
+      className={buttonVariants({ variant: "default" })}
       to={link}
       onClick={stopPropagation}
     >

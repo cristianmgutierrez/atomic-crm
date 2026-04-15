@@ -30,8 +30,8 @@ export const ContactCreate = ({
       transform={cleanupContactForCreate}
       mutationMode={mutationMode}
     >
-      <div className="mt-2 flex lg:mr-72" onKeyDown={preventEnterSubmit}>
-        <div className="flex-1">
+      <div className="mt-2 flex justify-center" onKeyDown={preventEnterSubmit}>
+        <div className="flex-1 max-w-4xl">
           <Form
             validate={validateContactForm}
             mode={CONTACT_FORM_MODE}

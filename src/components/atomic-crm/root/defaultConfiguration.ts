@@ -42,10 +42,10 @@ export const defaultDealCategories = [
 ];
 
 export const defaultNoteStatuses = [
-  { value: "ativo", label: "Ativo", color: "#a4e87d" },
-  { value: "inativo", label: "Inativo", color: "#7dbde8" },
-  { value: "prospect", label: "Prospect", color: "#e8cb7d" },
-  { value: "transferido", label: "Transferido", color: "#e88b7d" },
+  { value: "ativo", label: "Ativo", color: "#28b446" },
+  { value: "inativo", label: "Inativo", color: "#8c939b" },
+  { value: "prospect", label: "Prospect", color: "#f5a623" },
+  { value: "transferido", label: "Transferido", color: "#e74040" },
 ];
 
 export const defaultTaskTypes: TaskType[] = [

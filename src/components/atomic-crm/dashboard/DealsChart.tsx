@@ -9,6 +9,12 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import type { Deal } from "../types";
 
+function getCSSColor(varName: string): string {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+}
+
 const multiplier = {
   opportunity: 0.2,
   "proposal-sent": 0.5,
@@ -112,7 +118,11 @@ export const DealsChart = memo(() => {
           data={months}
           indexBy="date"
           keys={["won", "pending", "lost"]}
-          colors={["#61cdbb", "#97e3d5", "#e25c3b"]}
+          colors={[
+            getCSSColor("--chart-2"),
+            getCSSColor("--chart-3"),
+            getCSSColor("--chart-5"),
+          ]}
           margin={{ top: 30, right: 50, bottom: 30, left: 0 }}
           padding={0.3}
           valueScale={{
@@ -190,7 +200,7 @@ export const DealsChart = memo(() => {
                 axis: "y",
                 value: 0,
                 lineStyle: { strokeOpacity: 0 },
-                textStyle: { fill: "#2ebca6" },
+                textStyle: { fill: "var(--color-chart-2)" },
                 legend: wonLabel,
                 legendPosition: "top-left",
                 legendOrientation: "vertical",
@@ -199,10 +209,10 @@ export const DealsChart = memo(() => {
                 axis: "y",
                 value: 0,
                 lineStyle: {
-                  stroke: "#f47560",
+                  stroke: "var(--color-chart-5)",
                   strokeWidth: 1,
                 },
-                textStyle: { fill: "#e25c3b" },
+                textStyle: { fill: "var(--color-chart-5)" },
                 legend: lostLabel,
                 legendPosition: "bottom-left",
                 legendOrientation: "vertical",
