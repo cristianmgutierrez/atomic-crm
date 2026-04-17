@@ -14,6 +14,7 @@ import {
   Building,
   Calendar,
   Check,
+  Copy,
   CreditCard,
   Instagram,
   Linkedin,
@@ -91,11 +92,7 @@ export const ContactPersonalInfo = () => {
       {/* Phones */}
       <ArrayField source="phone_jsonb">
         <SingleFieldList className="flex-col gap-y-0">
-          <PersonalInfoRow
-            icon={<Phone className="w-4 h-4 text-muted-foreground" />}
-            primary={<TextField source="number" />}
-            showType
-          />
+          <PhoneRow />
         </SingleFieldList>
       </ArrayField>
 
@@ -143,6 +140,7 @@ export const ContactPersonalInfo = () => {
               {record.person_type === "PJ" ? "CNPJ" : "CPF"}: {record.document}
             </span>
           }
+          copyValue={record.document}
         />
       )}
 
@@ -170,43 +168,64 @@ export const ContactPersonalInfo = () => {
               XP: {record.xp_code}
             </span>
           }
+          copyValue={record.xp_code}
         />
       )}
     </div>
   );
 };
 
-const EmailRow = () => {
-  const record = useRecordContext<{ email: string }>();
-  const translate = useTranslate();
+const CopyButton = ({ value }: { value: string }) => {
   const [copied, setCopied] = useState(false);
 
-  if (!record) return null;
-
   const handleCopy = () => {
-    navigator.clipboard.writeText(record.email).then(() => {
+    navigator.clipboard.writeText(value).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
 
   return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="ml-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors cursor-pointer"
+    >
+      {copied ? (
+        <Check className="w-3 h-3 text-green-500" />
+      ) : (
+        <Copy className="w-3 h-3" />
+      )}
+    </button>
+  );
+};
+
+const EmailRow = () => {
+  const record = useRecordContext<{ email: string }>();
+
+  if (!record) return null;
+
+  return (
     <PersonalInfoRow
-      icon={
-        <button
-          type="button"
-          onClick={handleCopy}
-          title={translate("crm.common.copy")}
-          className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
-          {copied ? (
-            <Check className="w-4 h-4 text-green-500" />
-          ) : (
-            <Mail className="w-4 h-4" />
-          )}
-        </button>
-      }
+      icon={<Mail className="w-4 h-4 text-muted-foreground" />}
       primary={<EmailField source="email" />}
+      copyValue={record.email}
+    />
+  );
+};
+
+const PhoneRow = () => {
+  const record = useRecordContext<{ number: string; type: string }>();
+  const translate = useTranslate();
+
+  if (!record) return null;
+
+  return (
+    <PersonalInfoRow
+      icon={<Phone className="w-4 h-4 text-muted-foreground" />}
+      primary={<TextField source="number" />}
+      showType
+      copyValue={record.number}
     />
   );
 };
@@ -215,17 +234,19 @@ const PersonalInfoRow = ({
   icon,
   primary,
   showType,
+  copyValue,
 }: {
   icon: ReactNode;
   primary: ReactNode;
   showType?: boolean;
+  copyValue?: string;
 }) => {
   const translate = useTranslate();
 
   return (
     <div className="flex flex-row items-center gap-x-2 py-1 min-h-6">
       {icon}
-      <div className="flex flex-wrap gap-x-2 gap-y-0 text-sm">
+      <div className="flex flex-wrap gap-x-2 gap-y-0 text-sm items-center">
         {primary}
         {showType ? (
           <WithRecord
@@ -238,6 +259,7 @@ const PersonalInfoRow = ({
             }
           />
         ) : null}
+        {copyValue && <CopyButton value={copyValue} />}
       </div>
     </div>
   );
