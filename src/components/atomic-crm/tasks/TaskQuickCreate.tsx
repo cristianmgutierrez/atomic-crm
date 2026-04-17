@@ -63,7 +63,7 @@ export const TaskQuickCreate = ({
                     className={cn(
                       "flex flex-col items-center gap-0.5 h-auto py-1.5 px-2.5 min-w-[3rem] cursor-pointer",
                       type === taskType.value &&
-                        "bg-accent text-accent-foreground",
+                        "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground",
                     )}
                   >
                     <Icon className="h-4 w-4" />
