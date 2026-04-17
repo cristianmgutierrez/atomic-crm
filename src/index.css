@@ -186,3 +186,27 @@ input[type="time"] {
 body {
   font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Dark theme scrollbars */
+.dark * {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.35 0.01 250) oklch(0.22 0.01 250);
+}
+
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: oklch(0.22 0.01 250);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0.01 250);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-corner {
+  background: oklch(0.22 0.01 250);
+}
