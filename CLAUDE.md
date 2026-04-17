@@ -30,21 +30,24 @@ Estes princípios são obrigatórios em qualquer mudança neste projeto. Quando 
 ## Arquitetura Multi-Escritório (Multi-Tenant)
 
 ### Modelo de dados
-- Nova tabela `escritorios` (id, nome) — cadastro no menu Configurações
-- Tabela `sales` recebe `escritorio_id` (FK → escritorios) e `papel` (enum: 'gestor' | 'assessor')
-- Todas as entidades principais (contacts, companies, deals, tasks, notes) terão `escritorio_id`
+- Tabela `escritorios` (id, nome) — cadastro no menu Configurações
+- Tabela `sales` tem `escritorio_id` (FK → escritorios) e `papel` (enum: 'gestor' | 'assessor')
+- Entidades principais (contacts, companies, deals, tasks, tags, pipelines) têm `escritorio_id`, preenchido automaticamente via trigger `set_escritorio_id_default` a partir do usuário autenticado ([04_triggers.sql](supabase/schemas/04_triggers.sql))
 
 ### Papéis de usuário
 | Papel | Acesso |
 |-------|--------|
+| admin (`sales.administrator = true`) | Acesso total (bypass de RLS via `is_admin()`); gestão de usuários e escritórios |
 | `gestor` | Vê e edita todos os registros do próprio escritório |
 | `assessor` | Vê e edita apenas os próprios registros (onde `sales_id = seu id`) |
 
 ### RLS (Row Level Security)
-As policies do Supabase devem refletir esses papéis:
-- **Gestor**: `escritorio_id = (SELECT escritorio_id FROM sales WHERE user_id = auth.uid())`
-- **Assessor**: `sales_id = (SELECT id FROM sales WHERE user_id = auth.uid())`
-- Atualmente o RLS é permissivo (all authenticated = full access) — isso deve ser substituído
+Policies canônicas em [05_policies.sql](supabase/schemas/05_policies.sql), baseadas nos helpers SQL de [02_functions.sql](supabase/schemas/02_functions.sql): `is_admin()`, `get_my_papel()`, `get_my_escritorio_id()`, `get_my_sales_id()`.
+- **Admin**: bypassa via `is_admin()` — acesso total
+- **Gestor**: `escritorio_id = get_my_escritorio_id()` — tudo do próprio escritório
+- **Assessor**: `sales_id = get_my_sales_id()` — apenas os próprios registros
+- Inserts exigem `escritorio_id = get_my_escritorio_id()` (trigger preenche automaticamente)
+- Views (`activity_log`, `contacts_summary`, `companies_summary`) usam `security_invoker = on` para herdar as policies das tabelas subjacentes
 
 ## Contexto de Negócio (Family Office)
 
@@ -56,9 +59,12 @@ As policies do Supabase devem refletir esses papéis:
 ## Roadmap de Customizações
 
 1. **[Concluído]** Atualizar CLAUDE.md com contexto do projeto
-2. **[Próximo]** Criar tabela `escritorios` e adicionar `escritorio_id` + `papel` em `sales`
-3. Implementar RLS multi-tenant em todas as tabelas
-4. Atualizar edge function `users` para capturar `escritorio_id` e `papel`
-5. Criar UI de gestão de escritórios em Configurações
-6. Atualizar UI de usuários com campos de escritório e papel
-7. Adaptar configurações (deal stages, categorias, setores) para contexto de Family Office
+2. **[Concluído]** Criar tabela `escritorios` e adicionar `escritorio_id` + `papel` em `sales`
+3. **[Concluído]** Implementar RLS multi-tenant em todas as tabelas
+4. **[Concluído]** Atualizar edge function `users` para capturar `escritorio_id` e `papel`
+5. **[Concluído]** Criar UI de gestão de escritórios em Configurações
+6. **[Concluído]** Atualizar UI de usuários com campos de escritório e papel
+7. **[Em curso]** Adaptar configurações (deal stages, categorias, setores) para contexto de Family Office
+8. **[Pendente]** Isolar attachments no storage por escritório (bucket privado + prefixo de path + signed URLs)
+9. **[Pendente]** Endurecer grants: revogar `anon` das tabelas de domínio
+10. **[Pendente]** Suíte pgTAP validando isolamento RLS por papel/escritório

@@ -111,6 +111,13 @@ const getSale = async () => {
   return dataSale;
 };
 
+export const getCurrentEscritorioId = async (): Promise<number | null> => {
+  const sale = await getSale();
+  const raw = sale?.escritorio_id;
+  if (raw == null) return null;
+  return typeof raw === "string" ? Number(raw) : raw;
+};
+
 function clearCache() {
   const storage = getLocalStorage();
   storage?.removeItem(IS_INITIALIZED_CACHE_KEY);

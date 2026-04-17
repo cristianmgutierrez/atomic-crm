@@ -102,6 +102,9 @@ test-app:
 test-functions:
 	npm run test:unit:functions
 
+test-db: ## run pgTAP tests for database (RLS, policies, triggers)
+	npx supabase test db
+
 test-e2e: start-e2e
 	npx playwright test --ui
 

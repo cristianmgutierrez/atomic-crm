@@ -16,8 +16,15 @@ import type {
 } from "../../types";
 import type { ConfigurationContextValue } from "../../root/ConfigurationContext";
 import { ATTACHMENTS_BUCKET } from "../commons/attachments";
-import { getIsInitialized } from "./authProvider";
+import { getCurrentEscritorioId, getIsInitialized } from "./authProvider";
 import { getSupabaseClient } from "./supabase";
+
+// 7 days. The bucket is private; signed URLs are the only way to access objects.
+// On every read we re-sign (refreshAttachmentUrls) so persisted URLs going stale
+// is not a correctness issue — it just means the user has to refetch the record.
+const SIGNED_URL_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+type UploadScope = "task" | "company" | "sale" | "config";
 
 const getBaseDataProvider = () =>
   supabaseDataProvider({
@@ -31,7 +38,7 @@ const processCompanyLogo = async (params: any) => {
   const logo = params.data.logo;
 
   if (logo?.rawFile instanceof File) {
-    await uploadToBucket(logo);
+    await uploadToBucket(logo, "company");
   }
 
   return {
@@ -156,7 +163,7 @@ const getDataProviderWithCustomMethods = () => {
         | undefined = undefined;
       if (avatarData !== undefined) {
         if (avatarData && (avatarData as any).rawFile) {
-          const uploaded = await uploadToBucket(avatarData as RAFile);
+          const uploaded = await uploadToBucket(avatarData as RAFile, "sale");
           avatar = {
             src: uploaded.src,
             path: uploaded.path,
@@ -282,7 +289,7 @@ export type CrmDataProvider = ReturnType<
 const processConfigLogo = async (logo: any): Promise<string> => {
   if (typeof logo === "string") return logo;
   if (logo?.rawFile instanceof File) {
-    await uploadToBucket(logo);
+    await uploadToBucket(logo, "config");
     return logo.src;
   }
   return logo?.src ?? "";
@@ -305,19 +312,57 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
     beforeSave: async (data: Task, _, __) => {
       if (data.attachments) {
         data.attachments = await Promise.all(
-          data.attachments.map((fi) => uploadToBucket(fi)),
+          data.attachments.map((fi) => uploadToBucket(fi, "task")),
         );
       }
       return data;
+    },
+    afterGetOne: async (result) => {
+      result.data = await refreshTaskAttachments(result.data as Task);
+      return result;
+    },
+    afterGetList: async (result) => {
+      result.data = await Promise.all(
+        (result.data as Task[]).map((t) => refreshTaskAttachments(t)),
+      );
+      return result;
+    },
+    afterGetMany: async (result) => {
+      result.data = await Promise.all(
+        (result.data as Task[]).map((t) => refreshTaskAttachments(t)),
+      );
+      return result;
+    },
+    afterGetManyReference: async (result) => {
+      result.data = await Promise.all(
+        (result.data as Task[]).map((t) => refreshTaskAttachments(t)),
+      );
+      return result;
     },
   },
   {
     resource: "sales",
     beforeSave: async (data: Sale, _, __) => {
       if (data.avatar) {
-        await uploadToBucket(data.avatar);
+        await uploadToBucket(data.avatar, "sale");
       }
       return data;
+    },
+    afterGetOne: async (result) => {
+      result.data = await refreshAvatar(result.data as Sale);
+      return result;
+    },
+    afterGetList: async (result) => {
+      result.data = await Promise.all(
+        (result.data as Sale[]).map((s) => refreshAvatar(s)),
+      );
+      return result;
+    },
+    afterGetMany: async (result) => {
+      result.data = await Promise.all(
+        (result.data as Sale[]).map((s) => refreshAvatar(s)),
+      );
+      return result;
     },
   },
   {
@@ -368,6 +413,22 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
     },
     beforeUpdate: async (params) => {
       return await processCompanyLogo(params);
+    },
+    afterGetOne: async (result) => {
+      result.data = await refreshLogo(result.data as any);
+      return result;
+    },
+    afterGetList: async (result) => {
+      result.data = await Promise.all(
+        (result.data as any[]).map((c) => refreshLogo(c)),
+      );
+      return result;
+    },
+    afterGetMany: async (result) => {
+      result.data = await Promise.all(
+        (result.data as any[]).map((c) => refreshLogo(c)),
+      );
+      return result;
     },
   },
   {
@@ -429,38 +490,59 @@ const applyFullTextSearch = (columns: string[]) => (params: GetListParams) => {
   };
 };
 
-const uploadToBucket = async (fi: RAFile) => {
+// Path layout in the (private) attachments bucket:
+//   escritorios/{escritorio_id}/tasks|companies|sales/...   → tenant-scoped
+//   configs/...                                              → global (single-row config)
+// Storage RLS policies (07_storage.sql) enforce that the prefix matches the caller's
+// escritorio (or the caller is admin). Callers that lack an escritorio context fall back
+// to `configs/` only when scope === 'config'.
+const buildStoragePath = async (
+  scope: UploadScope,
+  fileName: string,
+): Promise<string> => {
+  if (scope === "config") {
+    return `configs/${fileName}`;
+  }
+  const escritorioId = await getCurrentEscritorioId();
+  if (escritorioId == null) {
+    throw new Error(
+      "Cannot upload attachment: current user has no escritorio_id",
+    );
+  }
+  const folder =
+    scope === "task" ? "tasks" : scope === "company" ? "companies" : "sales";
+  return `escritorios/${escritorioId}/${folder}/${fileName}`;
+};
+
+const signUrl = async (path: string): Promise<string | null> => {
+  const { data, error } = await getSupabaseClient()
+    .storage.from(ATTACHMENTS_BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  if (error || !data?.signedUrl) return null;
+  return data.signedUrl;
+};
+
+const uploadToBucket = async (fi: RAFile, scope: UploadScope) => {
   const supabase = getSupabaseClient();
 
-  if (!fi.src.startsWith("blob:") && !fi.src.startsWith("data:")) {
-    // Sign URL check if path exists in the bucket
-    if (fi.path) {
-      const { error } = await supabase.storage
-        .from(ATTACHMENTS_BUCKET)
-        .createSignedUrl(fi.path, 60);
-
-      if (!error) {
-        return fi;
-      }
+  // Already uploaded (no new content) — just refresh the signed URL so it doesn't
+  // expire mid-session. If signing fails the path is gone or RLS denied; fall through
+  // to the re-upload path so the user doesn't lose data silently.
+  if (!fi.src?.startsWith("blob:") && !fi.src?.startsWith("data:") && fi.path) {
+    const refreshed = await signUrl(fi.path);
+    if (refreshed) {
+      fi.src = refreshed;
+      return fi;
     }
   }
 
   const dataContent = fi.src
     ? await fetch(fi.src)
-        .then((res) => {
-          if (res.status !== 200) {
-            return null;
-          }
-          return res.blob();
-        })
+        .then((res) => (res.status !== 200 ? null : res.blob()))
         .catch(() => null)
     : fi.rawFile;
 
   if (dataContent == null) {
-    // We weren't able to download the file from its src (e.g. user must be signed in on another website to access it)
-    // or the file has no content (not probable)
-    // In that case, just return it as is: when trying to download it, users should be redirected to the other website
-    // and see they need to be signed in. It will then be their responsibility to upload the file back to the note.
     return fi;
   }
 
@@ -468,7 +550,8 @@ const uploadToBucket = async (fi: RAFile) => {
   const fileParts = file.name.split(".");
   const fileExt = fileParts.length > 1 ? `.${file.name.split(".").pop()}` : "";
   const fileName = `${Math.random()}${fileExt}`;
-  const filePath = `${fileName}`;
+  const filePath = await buildStoragePath(scope, fileName);
+
   const { error: uploadError } = await supabase.storage
     .from(ATTACHMENTS_BUCKET)
     .upload(filePath, dataContent);
@@ -478,16 +561,61 @@ const uploadToBucket = async (fi: RAFile) => {
     throw new Error("Failed to upload attachment");
   }
 
-  const { data } = supabase.storage
-    .from(ATTACHMENTS_BUCKET)
-    .getPublicUrl(filePath);
+  const signed = await signUrl(filePath);
+  if (!signed) {
+    throw new Error("Failed to sign URL for newly uploaded attachment");
+  }
 
   fi.path = filePath;
-  fi.src = data.publicUrl;
-
-  // save MIME type
-  const mimeType = file.type;
-  fi.type = mimeType;
+  fi.src = signed;
+  fi.type = file.type;
 
   return fi;
+};
+
+// Refresh signed URLs on records returned from the API. Persisted `src` values
+// expire (TTL above), so every read replaces them with a freshly signed URL.
+// Skips items without a path (legacy/imported entries that point to external URLs).
+const refreshSignedUrls = async <T extends { path?: string; src?: string }>(
+  files: T[] | null | undefined,
+): Promise<T[] | null | undefined> => {
+  if (!files || files.length === 0) return files;
+  const paths = files.map((f) => f?.path).filter((p): p is string => !!p);
+  if (paths.length === 0) return files;
+
+  const { data, error } = await getSupabaseClient()
+    .storage.from(ATTACHMENTS_BUCKET)
+    .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+  if (error || !data) return files;
+
+  const byPath = new Map(
+    data
+      .filter((d) => d.path && d.signedUrl)
+      .map((d) => [d.path as string, d.signedUrl]),
+  );
+  return files.map((f) =>
+    f?.path && byPath.has(f.path) ? { ...f, src: byPath.get(f.path)! } : f,
+  );
+};
+
+const refreshTaskAttachments = async <T extends { attachments?: any[] }>(
+  task: T,
+): Promise<T> => {
+  if (!task?.attachments?.length) return task;
+  const refreshed = await refreshSignedUrls(task.attachments);
+  return { ...task, attachments: refreshed ?? task.attachments };
+};
+
+const refreshAvatar = async <T extends { avatar?: any }>(
+  record: T,
+): Promise<T> => {
+  if (!record?.avatar?.path) return record;
+  const refreshed = await refreshSignedUrls([record.avatar]);
+  return { ...record, avatar: refreshed?.[0] ?? record.avatar };
+};
+
+const refreshLogo = async <T extends { logo?: any }>(record: T): Promise<T> => {
+  if (!record?.logo?.path) return record;
+  const refreshed = await refreshSignedUrls([record.logo]);
+  return { ...record, logo: refreshed?.[0] ?? record.logo };
 };
