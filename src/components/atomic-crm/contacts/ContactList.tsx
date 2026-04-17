@@ -74,6 +74,10 @@ export const ContactList = () => {
 
   if (!identity) return null;
 
+  // Stopgap until RLS multi-tenant is enforced on the backend (CLAUDE.md roadmap item 3)
+  const permanentFilter =
+    identity.papel === "assessor" ? { sales_id: identity.id } : undefined;
+
   return (
     <List
       title={false}
@@ -81,6 +85,7 @@ export const ContactList = () => {
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
+      filter={permanentFilter}
     >
       <ContactListLayoutDesktop />
     </List>
