@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { useRecordContext, useTranslate } from "ra-core";
+import { PlusCircle } from "lucide-react";
 import { EditButton } from "@/components/admin/edit-button";
 import { DeleteButton } from "@/components/admin";
 import { ShowButton } from "@/components/admin/show-button";
+import { Button } from "@/components/ui/button";
 
 import { TagsListEdit } from "./TagsListEdit";
 import { ContactStatusSelector } from "./ContactInputs";
@@ -11,22 +14,37 @@ import { AsideSection } from "../misc/AsideSection";
 import type { Contact } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
 import { ExportVCardButton } from "./ExportVCardButton";
+import { DealCreate } from "../deals/DealCreate";
 
 export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
   const record = useRecordContext<Contact>();
   const translate = useTranslate();
+  const [createDealOpen, setCreateDealOpen] = useState(false);
 
   if (!record) return null;
 
   return (
     <div className="hidden sm:block w-92 min-w-92 text-sm">
-      <div className="mb-4 -ml-1">
+      <div className="mb-4 -ml-1 flex gap-1 items-center flex-wrap">
         {link === "edit" ? (
           <EditButton label="resources.contacts.action.edit" />
         ) : (
           <ShowButton label="resources.contacts.action.show" />
         )}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => setCreateDealOpen(true)}
+        >
+          <PlusCircle className="size-4" />
+          {translate("resources.deals.action.new")}
+        </Button>
       </div>
+      <DealCreate
+        open={createDealOpen}
+        initialValues={{ contact_ids: [record.id as number] }}
+        onClose={() => setCreateDealOpen(false)}
+      />
 
       <AsideSection title={translate("resources.notes.fields.status")}>
         <ContactStatusSelector />

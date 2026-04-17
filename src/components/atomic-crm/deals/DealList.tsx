@@ -1,7 +1,14 @@
 import type { ReactNode } from "react";
 import type { InputProps } from "ra-core";
-import { useGetIdentity, useListContext, useTranslate } from "ra-core";
+import {
+  useDataProvider,
+  useGetIdentity,
+  useListContext,
+  useTranslate,
+} from "ra-core";
 import { matchPath, useLocation } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import type { GetListResult } from "ra-core";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
@@ -11,6 +18,7 @@ import { FilterButton } from "@/components/admin/filter-form";
 import { SearchInput } from "@/components/admin/search-input";
 import { SelectInput } from "@/components/admin/select-input";
 
+import type { Deal } from "../types";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { useSelectedPipeline } from "../pipelines/useSelectedPipeline";
 import { TopToolbar } from "../layout/TopToolbar";
@@ -77,11 +85,49 @@ const DealLayout = () => {
   const matchShow = matchPath("/deals/:id/show", location.pathname);
   const matchEdit = matchPath("/deals/:id", location.pathname);
 
-  const { data, isPending, filterValues } = useListContext();
+  const { data: allDeals, isPending, filterValues } = useListContext<Deal>();
   const hasFilters = filterValues && Object.keys(filterValues).length > 0;
 
+  const dataProvider = useDataProvider();
+  const queryClient = useQueryClient();
+
+  const handleDealCreateSuccess = async (deal: Deal) => {
+    if (!allDeals) return;
+    const deals = allDeals.filter(
+      (d: Deal) => d.stage === deal.stage && d.id !== deal.id,
+    );
+    await Promise.all(
+      deals.map(async (oldDeal) =>
+        dataProvider.update("deals", {
+          id: oldDeal.id,
+          data: { index: oldDeal.index + 1 },
+          previousData: oldDeal,
+        }),
+      ),
+    );
+    const dealsById = deals.reduce(
+      (acc, d) => ({
+        ...acc,
+        [d.id]: { ...d, index: d.index + 1 },
+      }),
+      {} as { [key: string]: Deal },
+    );
+    const now = Date.now();
+    queryClient.setQueriesData<GetListResult | undefined>(
+      { queryKey: ["deals", "getList"] },
+      (res) => {
+        if (!res) return res;
+        return {
+          ...res,
+          data: res.data.map((d: Deal) => dealsById[d.id] || d),
+        };
+      },
+      { updatedAt: now },
+    );
+  };
+
   if (isPending) return null;
-  if (!data?.length && !hasFilters)
+  if (!allDeals?.length && !hasFilters)
     return (
       <>
         <DealEmpty>
@@ -95,7 +141,7 @@ const DealLayout = () => {
     <div className="w-full">
       <DealListContent />
       <DealArchivedList />
-      <DealCreate open={!!matchCreate} />
+      <DealCreate open={!!matchCreate} onSuccess={handleDealCreateSuccess} />
       <DealEdit open={!!matchEdit && !matchCreate} id={matchEdit?.params.id} />
       <DealShow open={!!matchShow} id={matchShow?.params.id} />
     </div>
