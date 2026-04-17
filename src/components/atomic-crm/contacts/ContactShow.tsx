@@ -28,6 +28,7 @@ import { ContactStatusSelector } from "./ContactInputs";
 import { ContactPersonalInfo } from "./ContactPersonalInfo";
 import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { ContactTasksList } from "./ContactTasksList";
+import { ContactTasksPanel } from "../tasks/ContactTasksPanel";
 import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
 import { ContactAside } from "./ContactAside";
@@ -280,19 +281,36 @@ const ContactShowContent = () => {
                 </ReferenceField>
               </div>
             </div>
-            <InfiniteListBase
-              resource="contact_notes"
-              filter={{ contact_id: record.id }}
-              sort={{ field: "date", order: "DESC" }}
-              perPage={25}
-              disableSyncWithLocation
-              storeKey={false}
-              empty={
-                <NoteCreate reference="contacts" showStatus className="mt-4" />
-              }
-            >
-              <NotesIterator reference="contacts" showStatus />
-            </InfiniteListBase>
+            <Tabs defaultValue="activity" className="mt-4">
+              <TabsList>
+                <TabsTrigger value="activity">Atividade</TabsTrigger>
+                <TabsTrigger value="notes">
+                  {translate("resources.notes.name", { smart_count: 2 })}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="activity">
+                <ContactTasksPanel />
+              </TabsContent>
+              <TabsContent value="notes">
+                <InfiniteListBase
+                  resource="contact_notes"
+                  filter={{ contact_id: record.id }}
+                  sort={{ field: "date", order: "DESC" }}
+                  perPage={25}
+                  disableSyncWithLocation
+                  storeKey={false}
+                  empty={
+                    <NoteCreate
+                      reference="contacts"
+                      showStatus
+                      className="mt-4"
+                    />
+                  }
+                >
+                  <NotesIterator reference="contacts" showStatus />
+                </InfiniteListBase>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>

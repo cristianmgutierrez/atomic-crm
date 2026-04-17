@@ -18,12 +18,16 @@ export interface TaskCreateSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contact_id?: Identifier;
+  initialType?: string;
+  initialText?: string;
 }
 
 export const TaskCreateSheet = ({
   open,
   onOpenChange,
   contact_id,
+  initialType,
+  initialText,
 }: TaskCreateSheetProps) => {
   const { identity } = useGetIdentity();
   const translate = useTranslate();
@@ -76,7 +80,11 @@ export const TaskCreateSheet = ({
         </span>
       }
       redirect={false}
-      record={getTaskCreateDefaults(identity.id, contact_id)}
+      record={{
+        ...getTaskCreateDefaults(identity.id, contact_id),
+        ...(initialType ? { type: initialType } : {}),
+        ...(initialText ? { text: initialText } : {}),
+      }}
       mutationOptions={{
         onSuccess: handleSuccess,
       }}

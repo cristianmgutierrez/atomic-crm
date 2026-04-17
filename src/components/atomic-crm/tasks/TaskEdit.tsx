@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { TaskDoneCheckbox } from "./TaskDoneCheckbox";
 import { TaskFormContent } from "./TaskFormContent";
 
 export const TaskEdit = ({
@@ -54,7 +55,7 @@ export const TaskEdit = ({
                 </DialogTitle>
               </DialogHeader>
               <TaskFormContent />
-              <DialogFooter className="w-full sm:justify-between gap-4">
+              <DialogFooter className="w-full sm:justify-between items-center gap-4">
                 <DeleteButton
                   mutationOptions={{
                     onSuccess: () => {
@@ -67,7 +68,10 @@ export const TaskEdit = ({
                   }}
                   redirect={false}
                 />
-                <SaveButton label="ra.action.save" />
+                <div className="flex items-center gap-4">
+                  <TaskDoneCheckbox />
+                  <SaveButton label="ra.action.save" />
+                </div>
               </DialogFooter>
             </Form>
           </DialogContent>
