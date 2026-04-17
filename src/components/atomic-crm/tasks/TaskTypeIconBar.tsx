@@ -1,4 +1,3 @@
-import { icons, CircleDot, type LucideIcon } from "lucide-react";
 import { useInput, FieldTitle, useResourceContext } from "ra-core";
 import type { InputProps } from "ra-core";
 
@@ -12,11 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-
-export const getTaskTypeIcon = (iconName?: string): LucideIcon => {
-  if (!iconName) return CircleDot;
-  return (icons as Record<string, LucideIcon>)[iconName] ?? CircleDot;
-};
+import { getTaskTypeIcon } from "./taskTypeUtils";
 
 export const TaskTypeIconBar = (props: TaskTypeIconBarProps) => {
   const {

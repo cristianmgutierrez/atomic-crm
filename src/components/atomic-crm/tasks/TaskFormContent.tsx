@@ -119,7 +119,7 @@ export const TaskFormContent = () => {
     } else {
       setDateTimeError(null);
     }
-  }, [endDate, dueDate, endTime, startTime]);
+  }, [endDate, dueDate, endTime, startTime, translate]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">

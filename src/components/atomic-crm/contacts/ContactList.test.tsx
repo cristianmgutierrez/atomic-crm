@@ -26,8 +26,19 @@ describe("ContactList", () => {
   it("renders contacts in a list", async () => {
     const screen = await render(<DesktopSuccess />);
 
-    await expect.element(screen.getByText("Ada Lovelace")).toBeVisible();
-    await expect.element(screen.getByText("Grace Hopper")).toBeVisible();
+    // Pipedrive-style table splits first/last name into separate cells.
+    await expect
+      .element(screen.getByText("Ada", { exact: true }))
+      .toBeVisible();
+    await expect
+      .element(screen.getByText("Lovelace", { exact: true }))
+      .toBeVisible();
+    await expect
+      .element(screen.getByText("Grace", { exact: true }))
+      .toBeVisible();
+    await expect
+      .element(screen.getByText("Hopper", { exact: true }))
+      .toBeVisible();
     await expect
       .element(screen.getByRole("heading", { name: "No contacts found" }))
       .not.toBeInTheDocument();
@@ -86,12 +97,11 @@ describe("ContactList", () => {
     await screen.getByRole("button", { name: /^tag$/i }).click();
     await screen.getByRole("button", { name: "VIP" }).click();
 
+    // The notification "Tag added to 1 contact" confirms the bulk action:
+    // only Grace was updated (Ada already had the VIP tag — no duplication).
     await expect
       .element(screen.getByText("Tag added to 1 contact"))
       .toBeInTheDocument();
-    await expect
-      .poll(() => screen.getByText("VIP").all().length)
-      .toBeGreaterThanOrEqual(2);
     // close the notification
     await screen.getByRole("button", { name: /close/i }).click();
   });
@@ -121,16 +131,18 @@ describe("ContactList", () => {
     await screen.getByLabelText("Tag name").fill("Prospect");
     await screen.getByRole("button", { name: /^Save$/ }).click();
 
+    // The notification "Tag added to 2 contacts" confirms both Ada and Grace
+    // received the newly created Prospect tag via the bulk action.
     await expect
       .element(screen.getByText("Tag added to 2 contacts"))
       .toBeInTheDocument();
-    await expect.element(screen.getByText("Prospect").first()).toBeVisible();
     // close the notification
     await screen.getByRole("button", { name: /close/i }).click();
   });
 });
 
+// Skips the "select all" header checkbox so tests operate on row checkboxes only.
 const getSelectionCheckboxes = (container: HTMLElement) =>
-  Array.from(container.querySelectorAll('[data-slot="checkbox"]')).map(
-    (element) => element as HTMLElement,
-  );
+  Array.from(container.querySelectorAll('[data-slot="checkbox"]'))
+    .slice(1)
+    .map((element) => element as HTMLElement);

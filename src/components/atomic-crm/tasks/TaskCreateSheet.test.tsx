@@ -50,9 +50,12 @@ describe("TaskCreateSheet", () => {
     // Fill description field (labeled "Descricao")
     await screen.getByLabelText(/descri/i).fill("Follow up about onboarding");
 
-    // Select contact via autocomplete
-    const contactInput = screen.getByRole("combobox").first();
-    await contactInput.click();
+    // Select contact via autocomplete.
+    // The AutocompleteInput runs in inline mode (no role="combobox"); target
+    // the Contact input by its accessible label, then type to open + filter
+    // the popover.
+    const contactInput = screen.getByLabelText(/contact/i);
+    await contactInput.fill("Grace");
     await screen.getByText("Grace Hopper").click();
 
     // Select task type via icon bar (click "Email" toggle)

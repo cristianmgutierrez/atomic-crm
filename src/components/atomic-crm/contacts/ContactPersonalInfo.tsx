@@ -216,7 +216,6 @@ const EmailRow = () => {
 
 const PhoneRow = () => {
   const record = useRecordContext<{ number: string; type: string }>();
-  const translate = useTranslate();
 
   if (!record) return null;
 

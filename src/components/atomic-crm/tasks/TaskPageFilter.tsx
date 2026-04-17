@@ -14,7 +14,7 @@ import { FilterCategory } from "../filters/FilterCategory";
 import { ResponsiveFilters } from "../misc/ResponsiveFilters";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { getTaskTypeIcon } from "./taskTypeUtils";
 
 export const TaskPageFilter = () => {
   const { taskTypes } = useConfigurationContext();

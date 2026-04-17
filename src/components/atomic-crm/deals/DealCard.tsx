@@ -23,13 +23,13 @@ export const DealCard = ({ deal, index }: { deal: Deal; index: number }) => {
 const FirstContact = ({ contactIds }: { contactIds?: number[] }) => {
   const firstId = contactIds?.[0];
 
-  if (!firstId) {
-    return null;
-  }
+  const { data: contact } = useGetOne(
+    "contacts_summary",
+    { id: firstId as number },
+    { enabled: firstId != null },
+  );
 
-  const { data: contact } = useGetOne("contacts_summary", { id: firstId });
-
-  if (!contact) {
+  if (!firstId || !contact) {
     return null;
   }
 

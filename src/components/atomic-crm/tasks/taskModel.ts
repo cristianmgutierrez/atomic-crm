@@ -4,7 +4,7 @@ import type { UseFormSetValue } from "react-hook-form";
 
 import type { TaskType } from "../types";
 import { formatMinutesToHHMM } from "./calendar/calendarUtils";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { getTaskTypeIcon } from "./taskTypeUtils";
 
 /**
  * Returns the default record values for creating a new task.

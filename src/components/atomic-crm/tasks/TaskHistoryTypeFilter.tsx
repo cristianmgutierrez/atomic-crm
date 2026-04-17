@@ -2,7 +2,7 @@ import { useTranslate } from "ra-core";
 import { cn } from "@/lib/utils";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { getTaskTypeIcon } from "./taskTypeUtils";
 
 export const TaskHistoryTypeFilter = ({
   value,

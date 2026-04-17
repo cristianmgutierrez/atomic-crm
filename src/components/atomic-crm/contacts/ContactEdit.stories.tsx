@@ -32,6 +32,7 @@ export const ContactEditBasic = ({
           id: 1,
           email_jsonb: [],
           phone_jsonb: [],
+          status: "",
         }),
       ],
     }}

@@ -44,6 +44,7 @@ export const createCrmDb = (overrides: Partial<Db> = {}): Db =>
     configuration: [{ config: {}, id: 1 }],
     contacts: [],
     deals: [],
+    pipelines: [],
     sales: [baseSale],
     tags: [],
     tasks: [],
@@ -51,6 +52,7 @@ export const createCrmDb = (overrides: Partial<Db> = {}): Db =>
   }) as Db;
 
 // Build a valid contact record with sensible defaults to keep tests and stories terse.
+// Uses status "prospect" so downstream validations (alias, person_type, document) stay optional.
 export const buildContact = (overrides: Partial<Contact> = {}): Contact => ({
   background: "",
   company_id: null,
@@ -67,7 +69,7 @@ export const buildContact = (overrides: Partial<Contact> = {}): Contact => ({
   nb_tasks: 0,
   phone_jsonb: [],
   sales_id: 0,
-  status: "inativo",
+  status: "prospect",
   tags: [],
   title: "CTO",
   ...overrides,

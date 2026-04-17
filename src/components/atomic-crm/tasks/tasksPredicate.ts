@@ -21,14 +21,18 @@ export const isRecentlyDone = (task: Task) =>
   isAfter(new Date(task.done_date), new Date(Date.now() - 5 * 60 * 1000));
 
 /**
- * Parses a date string as local midnight to avoid timezone shifts.
- * Handles both "YYYY-MM-DD" and "YYYY-MM-DDT..." (ISO timestamps from timestamptz columns).
+ * Parses a due-date string.
+ * - "YYYY-MM-DD" (from a `date` column) → local midnight of that day.
+ * - "YYYY-MM-DDT..." (ISO timestamp) → preserves the original instant.
+ *
+ * Slicing ISO timestamps to 10 chars and parsing as local midnight would shift
+ * the day across timezones (e.g. in BRT, 23:59:59.999 UTC+X becomes next day).
  */
 const parseLocalDate = (dateString: string): Date => {
-  const datePart = dateString.includes("T")
-    ? dateString.slice(0, 10)
-    : dateString;
-  const [y, m, d] = datePart.split("-").map(Number);
+  if (dateString.includes("T")) {
+    return new Date(dateString);
+  }
+  const [y, m, d] = dateString.split("-").map(Number);
   return new Date(y, m - 1, d);
 };
 

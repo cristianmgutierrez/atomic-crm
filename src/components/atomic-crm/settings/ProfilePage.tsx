@@ -40,7 +40,7 @@ export const ProfilePage = () => {
   const { identity, refetch: refetchIdentity } = useGetIdentity();
   const { data, refetch: refetchUser } = useGetOne(
     "sales",
-    { id: identity?.id! },
+    { id: identity?.id as number | string },
     { enabled: identity != null },
   );
   const translate = useTranslate();

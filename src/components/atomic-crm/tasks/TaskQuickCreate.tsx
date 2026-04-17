@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import { getTaskTypeIcon } from "./TaskTypeIconBar";
+import { getTaskTypeIcon } from "./taskTypeUtils";
 import { AddTask } from "./AddTask";
 
 export type TaskQuickCreateDefaults = {

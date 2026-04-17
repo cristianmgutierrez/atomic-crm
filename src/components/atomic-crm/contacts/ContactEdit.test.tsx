@@ -25,7 +25,7 @@ describe("ContactEdit", () => {
 
       // The form should display one empty phone placeholder input
       await expect
-        .element(screen.getByPlaceholder("Phone number"))
+        .element(screen.getByPlaceholder("+55 11 98765-4321"))
         .toBeInTheDocument();
     });
 
@@ -120,7 +120,7 @@ describe("ContactEdit", () => {
       const emailInput = screen.getByPlaceholder("Email");
       await expect.element(emailInput).toHaveValue("ada@example.com");
 
-      const phoneInput = screen.getByPlaceholder("Phone number");
+      const phoneInput = screen.getByPlaceholder("+55 11 98765-4321");
       await expect.element(phoneInput).toHaveValue("0123456789");
 
       // Submit without changes
@@ -162,7 +162,7 @@ describe("ContactEdit", () => {
 
       // The form should display one empty phone placeholder input
       await expect
-        .element(screen.getByPlaceholder("Phone number"))
+        .element(screen.getByPlaceholder("+55 11 98765-4321"))
         .toBeInTheDocument();
     });
 
@@ -260,7 +260,7 @@ describe("ContactEdit", () => {
       const emailInput = screen.getByPlaceholder("Email");
       await expect.element(emailInput).toHaveValue("ada@example.com");
 
-      const phoneInput = screen.getByPlaceholder("Phone number");
+      const phoneInput = screen.getByPlaceholder("+55 11 98765-4321");
       await expect.element(phoneInput).toHaveValue("0123456789");
 
       // Submit without changes

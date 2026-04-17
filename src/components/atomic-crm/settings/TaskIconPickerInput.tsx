@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getTaskTypeIcon } from "../tasks/TaskTypeIconBar";
+import { getTaskTypeIcon } from "../tasks/taskTypeUtils";
 
 const allIcons = icons as Record<string, LucideIcon>;
 const allIconNames = Object.keys(allIcons);
