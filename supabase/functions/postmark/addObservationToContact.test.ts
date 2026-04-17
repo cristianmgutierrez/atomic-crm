@@ -1,10 +1,10 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
-  addNoteToContact,
+  addObservationToContact,
   getOrCreateCompanyFromDomain,
   getOrCreateContactFromEmailInfo,
-} from "./addNoteToContact";
+} from "./addObservationToContact";
 
 const mockFrom = vi.hoisted(() => vi.fn());
 
@@ -14,7 +14,7 @@ vi.mock("../_shared/supabaseAdmin.ts", () => ({
   },
 }));
 
-describe("addNoteToContact", () => {
+describe("addObservationToContact", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -68,7 +68,6 @@ describe("addNoteToContact", () => {
       const result = await getOrCreateCompanyFromDomain("gmail.com", 42);
 
       expect(result).toBeNull();
-      // insert should never be called
       expect(mockFrom).toHaveBeenCalledTimes(1);
     });
 
@@ -76,7 +75,6 @@ describe("addNoteToContact", () => {
       const newCompany = { id: 2, name: "acme.com", sales_id: 42 };
       mockFrom
         .mockReturnValueOnce({
-          // first call: fetch
           select: () => ({
             eq: () => ({
               maybeSingle: () => Promise.resolve({ data: null, error: null }),
@@ -84,7 +82,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // second call: insert
           insert: () => ({
             select: () => Promise.resolve({ data: [newCompany], error: null }),
           }),
@@ -182,7 +179,6 @@ describe("addNoteToContact", () => {
 
       mockFrom
         .mockReturnValueOnce({
-          // 1st call: fetch contact → not found
           select: () => ({
             contains: () => ({
               maybeSingle: () => Promise.resolve({ data: null, error: null }),
@@ -190,7 +186,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 2nd call: fetch company → found
           select: () => ({
             eq: () => ({
               maybeSingle: () =>
@@ -199,7 +194,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 3rd call: insert contact
           insert: () => ({
             select: () => Promise.resolve({ data: [newContact], error: null }),
           }),
@@ -221,7 +215,6 @@ describe("addNoteToContact", () => {
 
       mockFrom
         .mockReturnValueOnce({
-          // 1st call: fetch contact → not found
           select: () => ({
             contains: () => ({
               maybeSingle: () => Promise.resolve({ data: null, error: null }),
@@ -229,7 +222,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 2nd call: fetch company (gmail.com) → not found (mail providers are never created)
           select: () => ({
             eq: () => ({
               maybeSingle: () => Promise.resolve({ data: null, error: null }),
@@ -237,7 +229,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 3rd call: insert contact (with null company_id)
           insert: () => ({
             select: () => Promise.resolve({ data: [newContact], error: null }),
           }),
@@ -250,7 +241,6 @@ describe("addNoteToContact", () => {
       });
 
       expect(result).toEqual(newContact);
-      // Only 3 froms: contacts fetch, companies fetch, contacts insert (no company insert for mail provider)
       expect(mockFrom).toHaveBeenCalledTimes(3);
     });
 
@@ -291,18 +281,18 @@ describe("addNoteToContact", () => {
     });
   });
 
-  describe("addNoteToContact", () => {
+  describe("addObservationToContact", () => {
     const baseParams = {
       salesEmail: "sales@company.com",
       email: "alice@acme.com",
       domain: "acme.com",
       firstName: "Alice",
       lastName: "Smith",
-      noteContent: "A note",
+      noteContent: "An observation",
       attachments: [],
     };
 
-    it("creates a note and returns undefined on success", async () => {
+    it("creates an observation task and returns undefined on success", async () => {
       const salesRecord = { id: 1, email: "sales@company.com" };
       const existingContact = {
         id: 10,
@@ -312,7 +302,6 @@ describe("addNoteToContact", () => {
 
       mockFrom
         .mockReturnValueOnce({
-          // 1st call: fetch sales → found
           select: () => ({
             eq: () => ({
               neq: () => ({
@@ -323,7 +312,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 2nd call: fetch contact → found
           select: () => ({
             contains: () => ({
               maybeSingle: () =>
@@ -332,25 +320,18 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 3rd call: insert note into contact_notes → success
           insert: () => Promise.resolve({ error: null }),
-        })
-        .mockReturnValueOnce({
-          // 4th call: update contacts.last_seen
-          update: () => ({
-            eq: () => Promise.resolve({ error: null }),
-          }),
         });
 
-      const result = await addNoteToContact(baseParams);
+      const result = await addObservationToContact(baseParams);
 
       expect(result).toBeUndefined();
-      expect(mockFrom).toHaveBeenCalledTimes(4);
-      expect(mockFrom).toHaveBeenNthCalledWith(3, "contact_notes");
-      expect(mockFrom).toHaveBeenNthCalledWith(4, "contacts");
+      // sales fetch + contact fetch + tasks insert (last_seen handled by trigger)
+      expect(mockFrom).toHaveBeenCalledTimes(3);
+      expect(mockFrom).toHaveBeenNthCalledWith(3, "tasks");
     });
 
-    it("returns 500 when inserting the note into contact_notes fails", async () => {
+    it("returns 500 when inserting the observation task fails", async () => {
       const salesRecord = { id: 1, email: "sales@company.com" };
       const existingContact = {
         id: 10,
@@ -360,7 +341,6 @@ describe("addNoteToContact", () => {
 
       mockFrom
         .mockReturnValueOnce({
-          // 1st call: fetch sales → found
           select: () => ({
             eq: () => ({
               neq: () => ({
@@ -371,7 +351,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 2nd call: fetch contact → found
           select: () => ({
             contains: () => ({
               maybeSingle: () =>
@@ -380,17 +359,16 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 3rd call: insert note into contact_notes → fails
           insert: () =>
             Promise.resolve({ error: { message: "Insert failed" } }),
         });
 
-      const response = await addNoteToContact(baseParams);
+      const response = await addObservationToContact(baseParams);
 
       expect(response).toBeInstanceOf(Response);
       expect(response!.status).toBe(500);
       expect(await response!.text()).toBe(
-        "Could not add note to contact alice@acme.com, sales sales@company.com",
+        "Could not add observation to contact alice@acme.com, sales sales@company.com",
       );
       expect(mockFrom).toHaveBeenCalledTimes(3);
     });
@@ -403,7 +381,6 @@ describe("addNoteToContact", () => {
 
       mockFrom
         .mockReturnValueOnce({
-          // 1st call: fetch sales → found
           select: () => ({
             eq: () => ({
               neq: () => ({
@@ -414,7 +391,6 @@ describe("addNoteToContact", () => {
           }),
         })
         .mockReturnValueOnce({
-          // 2nd call: fetch contact → DB error, causes getOrCreateContactFromEmailInfo to throw
           select: () => ({
             contains: () => ({
               maybeSingle: () =>
@@ -423,7 +399,7 @@ describe("addNoteToContact", () => {
           }),
         });
 
-      const response = await addNoteToContact(baseParams);
+      const response = await addObservationToContact(baseParams);
 
       expect(response).toBeInstanceOf(Response);
       expect(response!.status).toBe(500);

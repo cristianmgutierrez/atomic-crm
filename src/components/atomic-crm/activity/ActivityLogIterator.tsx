@@ -13,16 +13,16 @@ import { RotateCcw } from "lucide-react";
 import {
   COMPANY_CREATED,
   CONTACT_CREATED,
-  CONTACT_NOTE_CREATED,
   DEAL_CREATED,
-  DEAL_NOTE_CREATED,
+  TASK_CREATED,
+  TASK_DONE,
 } from "../consts";
 import type { Activity } from "../types";
 import { ActivityLogCompanyCreated } from "./ActivityLogCompanyCreated";
 import { ActivityLogContactCreated } from "./ActivityLogContactCreated";
-import { ActivityLogContactNoteCreated } from "./ActivityLogContactNoteCreated";
 import { ActivityLogDealCreated } from "./ActivityLogDealCreated";
-import { ActivityLogDealNoteCreated } from "./ActivityLogDealNoteCreated";
+import { ActivityLogTaskCreated } from "./ActivityLogTaskCreated";
+import { ActivityLogTaskDone } from "./ActivityLogTaskDone";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -114,16 +114,16 @@ function ActivityItem({ activity }: { activity: Activity }) {
     return <ActivityLogContactCreated activity={activity} />;
   }
 
-  if (activity.type === CONTACT_NOTE_CREATED) {
-    return <ActivityLogContactNoteCreated activity={activity} />;
-  }
-
   if (activity.type === DEAL_CREATED) {
     return <ActivityLogDealCreated activity={activity} />;
   }
 
-  if (activity.type === DEAL_NOTE_CREATED) {
-    return <ActivityLogDealNoteCreated activity={activity} />;
+  if (activity.type === TASK_CREATED) {
+    return <ActivityLogTaskCreated activity={activity} />;
+  }
+
+  if (activity.type === TASK_DONE) {
+    return <ActivityLogTaskDone activity={activity} />;
   }
 
   return null;

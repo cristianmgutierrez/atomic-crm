@@ -5,10 +5,12 @@ import { TextInput } from "@/components/admin/text-input";
 import { DatePickerInput } from "@/components/admin/date-picker-input";
 import { TimePickerSelect } from "@/components/admin/time-picker-select";
 import { RichTextInput } from "@/components/admin/rich-text-input";
+import { FileInput } from "@/components/admin/file-input";
 import { required, useGetOne, useTranslate } from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { contactOptionText } from "../misc/ContactOption";
+import { AttachmentField } from "./AttachmentField";
 import { TaskTypeIconBar } from "./TaskTypeIconBar";
 import type { Deal } from "../types";
 
@@ -196,6 +198,16 @@ export const TaskFormContent = () => {
           }}
         />
       </ReferenceInput>
+
+      <FileInput
+        source="attachments"
+        label={translate("resources.tasks.inputs.attachments", {
+          _: "Anexos",
+        })}
+        multiple
+      >
+        <AttachmentField source="src" title="title" target="_blank" />
+      </FileInput>
     </div>
   );
 };

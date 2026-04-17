@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  InfiniteListBase,
   RecordRepresentation,
   ShowBase,
   useShowContext,
@@ -20,8 +19,6 @@ import { Link } from "react-router";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
-import { NoteCreate, NotesIterator, NotesIteratorMobile } from "../notes";
-import { NoteCreateSheet } from "../notes/NoteCreateSheet";
 import { TagsListEdit } from "./TagsListEdit";
 import { ContactEditSheet } from "./ContactEditSheet";
 import { ContactStatusSelector } from "./ContactInputs";
@@ -58,7 +55,6 @@ export const ContactShow = (props: ShowBaseProps = {}) => {
 const ContactShowContentMobile = () => {
   const translate = useTranslate();
   const { defaultTitle, record, isPending } = useShowContext<Contact>();
-  const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   if (isPending || !record) return null;
 
@@ -66,13 +62,6 @@ const ContactShowContentMobile = () => {
 
   return (
     <>
-      {/* We need to repeat the note creation sheet here to support the note 
-      create button that is rendered when there are no notes. */}
-      <NoteCreateSheet
-        open={noteCreateOpen}
-        onOpenChange={setNoteCreateOpen}
-        contact_id={record.id}
-      />
       <ContactEditSheet
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -134,11 +123,8 @@ const ContactShowContentMobile = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="notes" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 h-10">
-            <TabsTrigger value="notes">
-              {translate("resources.notes.name", { smart_count: 2 })}
-            </TabsTrigger>
+        <Tabs defaultValue="tasks" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 h-10">
             <TabsTrigger value="tasks">
               {translate("crm.common.task_count", {
                 smart_count: taskCount ?? 0,
@@ -148,39 +134,6 @@ const ContactShowContentMobile = () => {
               {translate("crm.common.details")}
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="notes" className="mt-2">
-            <InfiniteListBase
-              resource="contact_notes"
-              filter={{ contact_id: record.id }}
-              sort={{ field: "date", order: "DESC" }}
-              perPage={25}
-              disableSyncWithLocation
-              storeKey={false}
-              empty={
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <p className="text-muted-foreground mb-4">
-                    {translate("resources.notes.empty")}
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setNoteCreateOpen(true)}
-                  >
-                    {translate("resources.notes.action.add")}
-                  </Button>
-                </div>
-              }
-              loading={false}
-              error={false}
-              queryOptions={{
-                onError: () => {
-                  /** override to hide notification as error case is handled by NotesIteratorMobile */
-                },
-              }}
-            >
-              <NotesIteratorMobile contactId={record.id} showStatus />
-            </InfiniteListBase>
-          </TabsContent>
 
           <TabsContent value="tasks" className="mt-4">
             <ContactTasksList />
@@ -281,36 +234,9 @@ const ContactShowContent = () => {
                 </ReferenceField>
               </div>
             </div>
-            <Tabs defaultValue="activity" className="mt-4">
-              <TabsList>
-                <TabsTrigger value="activity">Atividade</TabsTrigger>
-                <TabsTrigger value="notes">
-                  {translate("resources.notes.name", { smart_count: 2 })}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="activity">
-                <ContactTasksPanel />
-              </TabsContent>
-              <TabsContent value="notes">
-                <InfiniteListBase
-                  resource="contact_notes"
-                  filter={{ contact_id: record.id }}
-                  sort={{ field: "date", order: "DESC" }}
-                  perPage={25}
-                  disableSyncWithLocation
-                  storeKey={false}
-                  empty={
-                    <NoteCreate
-                      reference="contacts"
-                      showStatus
-                      className="mt-4"
-                    />
-                  }
-                >
-                  <NotesIterator reference="contacts" showStatus />
-                </InfiniteListBase>
-              </TabsContent>
-            </Tabs>
+            <div className="mt-4">
+              <ContactTasksPanel />
+            </div>
           </CardContent>
         </Card>
       </div>

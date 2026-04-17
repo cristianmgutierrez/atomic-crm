@@ -2,13 +2,12 @@ import { Plus } from "lucide-react";
 import {
   CreateBase,
   Form,
-  useDataProvider,
+  type Identifier,
   useGetIdentity,
   useGetRecordRepresentation,
   useNotify,
   useRecordContext,
   useTranslate,
-  useUpdate,
 } from "ra-core";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,7 +30,6 @@ import {
 import { TaskDoneCheckbox } from "./TaskDoneCheckbox";
 import { TaskFormContent } from "./TaskFormContent";
 import { getTaskCreateDefaults } from "./taskModel";
-import { foreignKeyMapping } from "../notes/foreignKeyMapping";
 
 export const AddTask = ({
   selectContact,
@@ -44,11 +42,14 @@ export const AddTask = ({
   display?: "chip" | "icon";
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  initialValues?: { type?: string; text?: string };
+  initialValues?: {
+    type?: string;
+    text?: string;
+    contact_id?: Identifier;
+    deal_id?: Identifier;
+  };
 }) => {
   const { identity } = useGetIdentity();
-  const dataProvider = useDataProvider();
-  const [update] = useUpdate();
   const queryClient = useQueryClient();
   const notify = useNotify();
   const translate = useTranslate();
@@ -68,21 +69,8 @@ export const AddTask = ({
     }
   };
 
-  const handleSuccess = async (data: any) => {
-    const contactId = data[foreignKeyMapping["contacts"]];
-    if (contactId) {
-      const { data: contactData } = await dataProvider.getOne("contacts", {
-        id: contactId,
-      });
-      if (contactData) {
-        await update("contacts", {
-          id: contactId,
-          data: { last_seen: new Date().toISOString() },
-          previousData: contactData,
-        });
-        queryClient.invalidateQueries({ queryKey: ["contacts", "getOne"] });
-      }
-    }
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["contacts", "getOne"] });
     notify("resources.tasks.added");
     setOpen(false);
   };

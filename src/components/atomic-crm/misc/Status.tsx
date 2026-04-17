@@ -9,9 +9,9 @@ export const Status = ({
   status: string;
   className?: string;
 }) => {
-  const { noteStatuses } = useConfigurationContext();
-  if (!status || !noteStatuses) return null;
-  const statusObject = noteStatuses.find((s: any) => s.value === status);
+  const { contactStatuses } = useConfigurationContext();
+  if (!status || !contactStatuses) return null;
+  const statusObject = contactStatuses.find((s: any) => s.value === status);
 
   if (!statusObject) return null;
   return (

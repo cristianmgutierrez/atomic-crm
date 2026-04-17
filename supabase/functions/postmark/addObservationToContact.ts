@@ -6,7 +6,6 @@ export const getOrCreateCompanyFromDomain = async (
   domain: string,
   salesId: number,
 ) => {
-  // Check if the company already exists
   const { data: existingCompany, error: fetchCompanyError } =
     await supabaseAdmin
       .from("companies")
@@ -24,7 +23,6 @@ export const getOrCreateCompanyFromDomain = async (
   }
 
   if (MAIL_PROVIDERS.includes(domain)) {
-    // We don't want to create companies for generic mail providers, as they are not really companies and it would pollute the database with useless entries.
     return null;
   }
 
@@ -53,7 +51,6 @@ export const getOrCreateContactFromEmailInfo = async ({
   salesId: number;
   domain: string;
 }) => {
-  // Check if the contact already exists
   const { data: existingContact, error: fetchContactError } =
     await supabaseAdmin
       .from("contacts")
@@ -72,7 +69,6 @@ export const getOrCreateContactFromEmailInfo = async ({
 
   const company = await getOrCreateCompanyFromDomain(domain, salesId);
 
-  // Create the contact
   const { data: newContacts, error: createContactError } = await supabaseAdmin
     .from("contacts")
     .insert({
@@ -94,7 +90,7 @@ export const getOrCreateContactFromEmailInfo = async ({
   return newContacts[0];
 };
 
-export const addNoteToContact = async ({
+export const addObservationToContact = async ({
   salesEmail,
   email,
   domain,
@@ -125,8 +121,7 @@ export const addNoteToContact = async ({
     );
   }
   if (!sales) {
-    // Return a 403 to let Postmark know that it's no use to retry this request
-    // https://postmarkapp.com/developer/webhooks/inbound-webhook#errors-and-retries
+    // 403 tells Postmark not to retry — invalid sender mapping.
     return new Response(
       `Unable to find (active) sales in database, email: ${salesEmail}`,
       { status: 403 },
@@ -164,24 +159,19 @@ export const addNoteToContact = async ({
     );
   }
 
-  // Add note to contact
-  const { error: createNoteError } = await supabaseAdmin
-    .from("contact_notes")
-    .insert({
-      contact_id: contact.id,
-      text: noteContent,
-      sales_id: sales.id,
-      attachments,
-    });
-  if (createNoteError) {
+  // Insert as a completed observation task — handle_task_last_seen trigger bumps last_seen.
+  const { error: createTaskError } = await supabaseAdmin.from("tasks").insert({
+    contact_id: contact.id,
+    type: "observation",
+    notes: noteContent,
+    done_date: new Date(),
+    sales_id: sales.id,
+    attachments,
+  });
+  if (createTaskError) {
     return new Response(
-      `Could not add note to contact ${email}, sales ${salesEmail}`,
+      `Could not add observation to contact ${email}, sales ${salesEmail}`,
       { status: 500 },
     );
   }
-
-  await supabaseAdmin
-    .from("contacts")
-    .update({ last_seen: new Date() })
-    .eq("id", contact.id);
 };

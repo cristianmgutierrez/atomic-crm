@@ -4,7 +4,7 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { addNoteToContact } from "./addNoteToContact.ts";
+import { addObservationToContact } from "./addObservationToContact.ts";
 import {
   getForwardedMailContent,
   stripSubjectForwardingPrefix,
@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    await addNoteToContact({
+    await addObservationToContact({
       salesEmail,
       email,
       domain,

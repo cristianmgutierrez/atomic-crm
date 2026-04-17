@@ -1,9 +1,6 @@
 import { generateCompanies } from "./companies";
-import { generateContactNotes } from "./contactNotes";
 import { generateContacts } from "./contacts";
-import { generateDealNotes } from "./dealNotes";
 import { generateDeals } from "./deals";
-import { finalize } from "./finalize";
 import { generatePipelines } from "./pipelines";
 import { generateSales } from "./sales";
 import { generateTags } from "./tags";
@@ -16,10 +13,8 @@ export default (): Db => {
   db.tags = generateTags(db);
   db.companies = generateCompanies(db);
   db.contacts = generateContacts(db);
-  db.contact_notes = generateContactNotes(db);
   db.pipelines = generatePipelines(db);
   db.deals = generateDeals(db);
-  db.deal_notes = generateDealNotes(db);
   db.tasks = generateTasks(db);
   db.configuration = [
     {
@@ -27,7 +22,6 @@ export default (): Db => {
       config: {} as Db["configuration"][number]["config"],
     },
   ];
-  finalize(db);
 
   return db;
 };

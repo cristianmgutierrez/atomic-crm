@@ -17,7 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ActiveFilterButton } from "../misc/ActiveFilterButton";
 
 export const ContactListFilter = () => {
-  const { noteStatuses } = useConfigurationContext();
+  const { contactStatuses } = useConfigurationContext();
   const isMobile = useIsMobile();
   const { identity } = useGetIdentity();
   const translate = useTranslate();
@@ -90,7 +90,7 @@ export const ContactListFilter = () => {
         label="resources.notes.fields.status"
         icon={<TrendingUp />}
       >
-        {noteStatuses.map((status) => (
+        {contactStatuses.map((status) => (
           <ToggleFilterButton
             key={status.value}
             className="w-auto md:w-full justify-between h-10 md:h-8"
@@ -156,7 +156,7 @@ export const ContactListFilter = () => {
 };
 
 export const ContactListFilterSummary = () => {
-  const { noteStatuses } = useConfigurationContext();
+  const { contactStatuses } = useConfigurationContext();
   const { identity } = useGetIdentity();
   const { data } = useGetList("tags", {
     pagination: { page: 1, perPage: 10 },
@@ -214,7 +214,7 @@ export const ContactListFilterSummary = () => {
         }}
       />
 
-      {noteStatuses.map((status) => (
+      {contactStatuses.map((status) => (
         <ActiveFilterButton
           key={status.value}
           className="w-auto justify-between h-8"

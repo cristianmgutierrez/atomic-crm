@@ -7,9 +7,7 @@
 alter table public.escritorios enable row level security;
 alter table public.companies enable row level security;
 alter table public.contacts enable row level security;
-alter table public.contact_notes enable row level security;
 alter table public.deals enable row level security;
-alter table public.deal_notes enable row level security;
 alter table public.sales enable row level security;
 alter table public.tags enable row level security;
 alter table public.pipelines enable row level security;
@@ -71,30 +69,6 @@ create policy "Contacts delete" on public.contacts for delete to authenticated u
     or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
 );
 
--- Contact Notes (multi-tenant)
-create policy "Contact notes select" on public.contact_notes for select to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-);
-create policy "Contact notes insert" on public.contact_notes for insert to authenticated with check (
-    public.is_admin()
-    or escritorio_id = public.get_my_escritorio_id()
-);
-create policy "Contact notes update" on public.contact_notes for update to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-) with check (
-    public.is_admin()
-    or escritorio_id = public.get_my_escritorio_id()
-);
-create policy "Contact notes delete" on public.contact_notes for delete to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-);
-
 -- Deals (multi-tenant)
 create policy "Deals select" on public.deals for select to authenticated using (
     public.is_admin()
@@ -114,30 +88,6 @@ create policy "Deals update" on public.deals for update to authenticated using (
     or escritorio_id = public.get_my_escritorio_id()
 );
 create policy "Deals delete" on public.deals for delete to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-);
-
--- Deal Notes (multi-tenant)
-create policy "Deal notes select" on public.deal_notes for select to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-);
-create policy "Deal notes insert" on public.deal_notes for insert to authenticated with check (
-    public.is_admin()
-    or escritorio_id = public.get_my_escritorio_id()
-);
-create policy "Deal notes update" on public.deal_notes for update to authenticated using (
-    public.is_admin()
-    or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
-    or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())
-) with check (
-    public.is_admin()
-    or escritorio_id = public.get_my_escritorio_id()
-);
-create policy "Deal notes delete" on public.deal_notes for delete to authenticated using (
     public.is_admin()
     or (public.get_my_papel() = 'gestor'   and escritorio_id = public.get_my_escritorio_id())
     or (public.get_my_papel() = 'assessor' and sales_id = public.get_my_sales_id())

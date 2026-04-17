@@ -6,12 +6,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar } from "../contacts/Avatar";
 import { RelativeDate } from "../misc/RelativeDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
-import type { ActivityContactNoteCreated, Contact } from "../types";
+import type { ActivityTaskDone, Contact } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
 import { ActivityLogNote } from "./ActivityLogNote";
 
-type ActivityLogContactNoteCreatedProps = {
-  activity: ActivityContactNoteCreated;
+type ActivityLogTaskDoneProps = {
+  activity: ActivityTaskDone;
 };
 
 function ContactAvatar() {
@@ -19,21 +19,18 @@ function ContactAvatar() {
   return <Avatar width={20} height={20} record={record} />;
 }
 
-export function ActivityLogContactNoteCreated({
-  activity,
-}: ActivityLogContactNoteCreatedProps) {
+export function ActivityLogTaskDone({ activity }: ActivityLogTaskDoneProps) {
   const context = useActivityLogContext();
   const isMobile = useIsMobile();
   const translate = useTranslate();
   const { identity } = useGetIdentity();
-  const { contactNote } = activity;
+  const { task } = activity;
   const isCurrentUser = activity.sales_id === identity?.id;
   const salesName = useGetSalesName(activity.sales_id, {
     enabled: !isCurrentUser,
   });
-  const link = isMobile
-    ? `/contacts/${contactNote.contact_id}/notes/${contactNote.id}`
-    : `/contacts/${contactNote.contact_id}/show`;
+  const link = isMobile ? false : `/contacts/${task.contact_id}/show`;
+
   return (
     <ActivityLogNote
       header={
@@ -41,7 +38,7 @@ export function ActivityLogContactNoteCreated({
           <ReferenceField
             source="contact_id"
             reference="contacts"
-            record={activity.contactNote}
+            record={task}
           >
             <ContactAvatar />
           </ReferenceField>
@@ -49,14 +46,17 @@ export function ActivityLogContactNoteCreated({
           <span className="text-muted-foreground text-sm flex-grow">
             {translate(
               isCurrentUser
-                ? "crm.activity.you_added_note"
-                : "crm.activity.added_note",
-              { name: salesName },
+                ? "crm.activity.you_completed_task"
+                : "crm.activity.completed_task",
+              {
+                name: salesName,
+                _: `${salesName ?? "Voce"} concluiu uma tarefa`,
+              },
             )}{" "}
             <ReferenceField
               source="contact_id"
               reference="contacts"
-              record={activity.contactNote}
+              record={task}
             >
               <TextField source="first_name" /> <TextField source="last_name" />
             </ReferenceField>
@@ -75,7 +75,7 @@ export function ActivityLogContactNoteCreated({
           )}
         </div>
       }
-      text={contactNote.text}
+      text={task.text ?? task.notes ?? ""}
       link={link}
     />
   );

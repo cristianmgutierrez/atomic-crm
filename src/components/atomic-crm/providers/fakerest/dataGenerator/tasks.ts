@@ -34,7 +34,7 @@ export const type: string[] = [
 ];
 
 export const generateTasks = (db: Db) => {
-  return Array.from(Array(400).keys()).map<Task>((id) => {
+  const openTasks: Task[] = Array.from(Array(400).keys()).map<Task>((id) => {
     const contact = random.arrayElement(db.contacts);
     contact.nb_tasks++;
     const dueDate = randomDate(
@@ -57,4 +57,69 @@ export const generateTasks = (db: Db) => {
       source: "manual",
     };
   });
+
+  // Observation tasks vinculadas a contatos (substituem as antigas contact_notes).
+  const contactObservations: Task[] = Array.from(Array(1200).keys()).map<Task>(
+    (i) => {
+      const id = openTasks.length + i;
+      const contact = random.arrayElement(db.contacts);
+      contact.nb_tasks++;
+      const date = randomDate(new Date(contact.first_seen));
+      contact.last_seen =
+        date > new Date(contact.last_seen)
+          ? date.toISOString()
+          : contact.last_seen;
+      return {
+        id,
+        contact_id: contact.id,
+        type: "observation",
+        text: undefined,
+        notes: lorem.paragraphs(datatype.number({ min: 1, max: 4 })),
+        due_date: date.toISOString().slice(0, 10),
+        end_date: date.toISOString().slice(0, 10),
+        start_time: undefined,
+        end_time: undefined,
+        deal_id: undefined,
+        done_date: date.toISOString(),
+        sales_id: contact.sales_id,
+        source: "migrated_note",
+      };
+    },
+  );
+
+  // Observation tasks vinculadas a deals (substituem as antigas deal_notes).
+  const dealObservations: Task[] = Array.from(Array(300).keys()).map<Task>(
+    (i) => {
+      const id = openTasks.length + contactObservations.length + i;
+      const deal = random.arrayElement(db.deals);
+      const contactId = deal.contact_ids?.[0];
+      const contact =
+        contactId != null
+          ? db.contacts[contactId as number]
+          : random.arrayElement(db.contacts);
+      contact.nb_tasks++;
+      const date = randomDate(new Date(deal.created_at));
+      contact.last_seen =
+        date > new Date(contact.last_seen)
+          ? date.toISOString()
+          : contact.last_seen;
+      return {
+        id,
+        contact_id: contact.id,
+        deal_id: deal.id,
+        type: "observation",
+        text: undefined,
+        notes: lorem.paragraphs(datatype.number({ min: 1, max: 4 })),
+        due_date: date.toISOString().slice(0, 10),
+        end_date: date.toISOString().slice(0, 10),
+        start_time: undefined,
+        end_time: undefined,
+        done_date: date.toISOString(),
+        sales_id: deal.sales_id,
+        source: "migrated_note",
+      };
+    },
+  );
+
+  return [...openTasks, ...contactObservations, ...dealObservations];
 };

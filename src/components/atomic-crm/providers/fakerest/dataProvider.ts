@@ -11,9 +11,7 @@ import fakeRestDataProvider from "ra-data-fakerest";
 import type {
   Company,
   Contact,
-  ContactNote,
   Deal,
-  DealNote,
   Sale,
   SalesFormData,
   SignUpData,
@@ -360,7 +358,7 @@ export const createDataProvider = ({
 
           const newSaleId = params.meta.identity.id as Identifier;
 
-          const [companies, contacts, contactNotes, deals] = await Promise.all([
+          const [companies, contacts, tasks, deals] = await Promise.all([
             dataProvider.getList("companies", {
               filter: { sales_id: params.id },
               pagination: {
@@ -377,7 +375,7 @@ export const createDataProvider = ({
               },
               sort: { field: "id", order: "ASC" },
             }),
-            dataProvider.getList("contact_notes", {
+            dataProvider.getList("tasks", {
               filter: { sales_id: params.id },
               pagination: {
                 page: 1,
@@ -408,8 +406,8 @@ export const createDataProvider = ({
                 sales_id: newSaleId,
               },
             }),
-            dataProvider.updateMany("contact_notes", {
-              ids: contactNotes.data.map((company) => company.id),
+            dataProvider.updateMany("tasks", {
+              ids: tasks.data.map((task) => task.id),
               data: {
                 sales_id: newSaleId,
               },
@@ -466,16 +464,23 @@ export const createDataProvider = ({
       } satisfies ResourceCallbacks<Contact>,
       {
         resource: "tasks",
+        beforeSave: async (params) => preserveAttachmentMimeType(params),
         afterCreate: async (result, dataProvider) => {
-          // update the task count in the related contact
-          const { contact_id } = result.data;
+          // update the task count and last_seen in the related contact
+          // (mirrors the SQL trigger handle_task_last_seen in production)
+          const { contact_id, done_date } = result.data;
+          if (contact_id == null) return result;
           const { data: contact } = await dataProvider.getOne("contacts", {
             id: contact_id,
           });
+          const seenAt = done_date ?? new Date().toISOString();
+          const shouldBumpLastSeen =
+            !contact.last_seen || contact.last_seen < seenAt;
           await dataProvider.update("contacts", {
             id: contact_id,
             data: {
               nb_tasks: (contact.nb_tasks ?? 0) + 1,
+              ...(shouldBumpLastSeen ? { last_seen: seenAt } : {}),
             },
             previousData: contact,
           });
@@ -494,18 +499,24 @@ export const createDataProvider = ({
         },
         afterUpdate: async (result, dataProvider) => {
           // update the contact: if the task is done, decrement the nb tasks, otherwise increment it
-          const { contact_id } = result.data;
+          // also bump last_seen when a task transitions to done (mirrors SQL trigger)
+          const { contact_id, done_date } = result.data;
+          if (contact_id == null) return result;
           const { data: contact } = await dataProvider.getOne("contacts", {
             id: contact_id,
           });
           if (taskUpdateType !== TASK_DONE_NOT_CHANGED) {
+            const isNowDone = taskUpdateType === TASK_MARKED_AS_DONE;
+            const seenAt = done_date ?? new Date().toISOString();
+            const shouldBumpLastSeen =
+              isNowDone && (!contact.last_seen || contact.last_seen < seenAt);
             await dataProvider.update("contacts", {
               id: contact_id,
               data: {
-                nb_tasks:
-                  taskUpdateType === TASK_MARKED_AS_DONE
-                    ? (contact.nb_tasks ?? 0) - 1
-                    : (contact.nb_tasks ?? 0) + 1,
+                nb_tasks: isNowDone
+                  ? (contact.nb_tasks ?? 0) - 1
+                  : (contact.nb_tasks ?? 0) + 1,
+                ...(shouldBumpLastSeen ? { last_seen: seenAt } : {}),
               },
               previousData: contact,
             });
@@ -597,14 +608,6 @@ export const createDataProvider = ({
           return result;
         },
       } satisfies ResourceCallbacks<Deal>,
-      {
-        resource: "contact_notes",
-        beforeSave: async (params) => preserveAttachmentMimeType(params),
-      } satisfies ResourceCallbacks<ContactNote>,
-      {
-        resource: "deal_notes",
-        beforeSave: async (params) => preserveAttachmentMimeType(params),
-      } satisfies ResourceCallbacks<DealNote>,
     ],
   ) as CrmDataProvider;
 

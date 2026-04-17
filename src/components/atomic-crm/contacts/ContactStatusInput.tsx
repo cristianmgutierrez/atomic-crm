@@ -8,26 +8,26 @@ import {
 } from "@/components/ui/select";
 import { ChevronDownIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Translate, useTranslate } from "ra-core";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import { Translate, useTranslate } from "ra-core";
 
 const NONE_VALUE = "__none__";
 
-type StatusSelectorProps = {
+type ContactStatusInputProps = {
   disabled?: boolean;
   status?: string;
   setStatus: (status: string) => void;
   triggerClassName?: string;
 };
 
-export const StatusSelector = ({
+export const ContactStatusInput = ({
   disabled,
   status,
   setStatus,
   triggerClassName,
-}: StatusSelectorProps) => {
-  const { noteStatuses } = useConfigurationContext();
+}: ContactStatusInputProps) => {
+  const { contactStatuses } = useConfigurationContext();
   const translate = useTranslate();
   const isMobile = useIsMobile();
   const noneLabel = translate("resources.contacts.background.status_none", {
@@ -35,8 +35,7 @@ export const StatusSelector = ({
   });
 
   if (isMobile) {
-    // use native select on mobile for better performance and accessibility
-    const selectedOption = noteStatuses.find((s) => s.value === status);
+    const selectedOption = contactStatuses.find((s) => s.value === status);
     return (
       <div className={cn("relative", "w-32", triggerClassName)}>
         <div
@@ -65,13 +64,13 @@ export const StatusSelector = ({
           disabled={disabled}
           value={status || ""}
           onChange={(e) => setStatus(e.target.value)}
-          aria-label={translate("resources.notes.fields.status", {
+          aria-label={translate("resources.contacts.fields.status", {
             _: "Status",
           })}
           className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
         >
           <option value="">{noneLabel}</option>
-          {noteStatuses.map((opt) => (
+          {contactStatuses.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -81,10 +80,7 @@ export const StatusSelector = ({
     );
   }
 
-  /**
-   * Radix's Select component doesn't allow empty string as value, so we use a placeholder value and convert it back to empty string on change
-   * @see https://github.com/radix-ui/primitives/issues/2706
-   */
+  // Radix Select doesn't allow empty string as value — placeholder + convert back.
   const handleValueChange = (value: string) => {
     setStatus(value === NONE_VALUE ? "" : value);
   };
@@ -104,7 +100,7 @@ export const StatusSelector = ({
             None
           </Translate>
         </SelectItem>
-        {noteStatuses.map((statusOption) => (
+        {contactStatuses.map((statusOption) => (
           <SelectItem key={statusOption.value} value={statusOption.value}>
             <div className="flex items-center gap-2">
               <span

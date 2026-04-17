@@ -7,13 +7,12 @@ import {
   type ResourceCallbacks,
 } from "ra-core";
 import type {
-  ContactNote,
   Deal,
-  DealNote,
   RAFile,
   Sale,
   SalesFormData,
   SignUpData,
+  Task,
 } from "../../types";
 import type { ConfigurationContextValue } from "../../root/ConfigurationContext";
 import { ATTACHMENTS_BUCKET } from "../commons/attachments";
@@ -302,19 +301,8 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
     },
   },
   {
-    resource: "contact_notes",
-    beforeSave: async (data: ContactNote, _, __) => {
-      if (data.attachments) {
-        data.attachments = await Promise.all(
-          data.attachments.map((fi) => uploadToBucket(fi)),
-        );
-      }
-      return data;
-    },
-  },
-  {
-    resource: "deal_notes",
-    beforeSave: async (data: DealNote, _, __) => {
+    resource: "tasks",
+    beforeSave: async (data: Task, _, __) => {
       if (data.attachments) {
         data.attachments = await Promise.all(
           data.attachments.map((fi) => uploadToBucket(fi)),

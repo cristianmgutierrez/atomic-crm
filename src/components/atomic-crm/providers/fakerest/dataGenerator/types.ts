@@ -1,9 +1,7 @@
 import type {
   Company,
   Contact,
-  ContactNote,
   Deal,
-  DealNote,
   Pipeline,
   Sale,
   Tag,
@@ -14,9 +12,7 @@ import type { ConfigurationContextValue } from "../../../root/ConfigurationConte
 export interface Db {
   companies: Company[];
   contacts: Contact[];
-  contact_notes: ContactNote[];
   deals: Deal[];
-  deal_notes: DealNote[];
   pipelines: Pipeline[];
   sales: Sale[];
   tags: Tag[];

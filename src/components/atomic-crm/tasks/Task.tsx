@@ -21,6 +21,7 @@ import {
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Contact, Deal, Task as TData } from "../types";
+import { TaskAttachments } from "./TaskAttachments";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -162,6 +163,7 @@ export const Task = ({
                 />
               )}
             </div>
+            <TaskAttachments task={task} />
           </div>
         </div>
 

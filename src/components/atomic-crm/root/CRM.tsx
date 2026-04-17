@@ -42,11 +42,11 @@ import {
 import type { CrmDataProvider } from "../providers/types";
 import {
   defaultCompanySectors,
+  defaultContactStatuses,
   defaultCurrency,
   defaultDarkModeLogo,
   defaultDealCategories,
   defaultLightModeLogo,
-  defaultNoteStatuses,
   defaultTaskTypes,
   defaultTitle,
 } from "./defaultConfiguration";
@@ -57,7 +57,6 @@ import { MobileTasksList } from "../tasks/MobileTasksList.tsx";
 import { ContactListMobile } from "../contacts/ContactList.tsx";
 import { ContactShow } from "../contacts/ContactShow.tsx";
 import { CompanyShow } from "../companies/CompanyShow.tsx";
-import { NoteShowPage } from "../notes/NoteShowPage.tsx";
 
 const defaultStore = localStorageStore(undefined, "CRM");
 
@@ -84,7 +83,7 @@ export type CRMProps = {
  * @param {LabeledValue[]} dealCategories - The categories of deals used in the application.
  * @param {RaThemeOptions} lightTheme - The theme to use when the application is in light mode.
  * @param {string} logo - The logo used in the CRM application.
- * @param {NoteStatus[]} noteStatuses - The statuses of notes used in the application.
+ * @param {ContactStatus[]} contactStatuses - The statuses of contacts used in the application.
  * @param {LabeledValue[]} taskTypes - The types of tasks used in the application.
  * @param {string} title - The title of the CRM application.
  *
@@ -115,7 +114,7 @@ export const CRM = ({
   dealCategories = defaultDealCategories,
   darkModeLogo = defaultDarkModeLogo,
   lightModeLogo = defaultLightModeLogo,
-  noteStatuses = defaultNoteStatuses,
+  contactStatuses = defaultContactStatuses,
   taskTypes = defaultTaskTypes,
   title = defaultTitle,
   dataProvider = defaultDataProviderBuilder(),
@@ -150,7 +149,7 @@ export const CRM = ({
         companySectors,
         currency,
         dealCategories,
-        noteStatuses,
+        contactStatuses,
         taskTypes,
         title,
         darkModeLogo,
@@ -260,8 +259,6 @@ const DesktopAdmin = (
       <Resource name="deals" {...deals} />
       <Resource name="contacts" {...contacts} />
       <Resource name="companies" {...companies} />
-      <Resource name="contact_notes" />
-      <Resource name="deal_notes" />
       <Resource name="tasks" {...tasks} />
       <Resource name="sales" {...sales} />
       <Resource name="tags" />
@@ -327,9 +324,7 @@ const MobileAdmin = (
           list={ContactListMobile}
           show={ContactShow}
           recordRepresentation={contacts.recordRepresentation}
-        >
-          <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
-        </Resource>
+        />
         <Resource name="companies" show={CompanyShow} />
         <Resource name="tasks" list={MobileTasksList} />
       </Admin>

@@ -10,8 +10,6 @@ const adminSupabase = createClient(
 // Tables in FK-safe deletion order (children before parents)
 const TABLES = [
   "tasks",
-  "contact_notes",
-  "deal_notes",
   "deals",
   "contacts",
   "companies",
@@ -100,18 +98,17 @@ async function createNotes({
   notes: {
     text: string;
     date?: string;
-    status?: "cold" | "warm" | "hot";
   }[];
 }) {
   if (notes.length === 0) return;
 
-  const { error } = await adminSupabase.from("contact_notes").insert(
-    notes.map(({ text, date, status = "cold" }) => ({
+  const { error } = await adminSupabase.from("tasks").insert(
+    notes.map(({ text, date }) => ({
       contact_id: contactId,
       sales_id: salesId,
-      text,
-      date,
-      status,
+      type: "observation",
+      notes: text,
+      done_date: date ?? new Date().toISOString(),
     })),
   );
 
@@ -156,7 +153,6 @@ async function createContact({
   notes?: {
     text: string;
     date?: string;
-    status?: "cold" | "warm" | "hot";
   }[];
 }) {
   const { data, error } = await adminSupabase

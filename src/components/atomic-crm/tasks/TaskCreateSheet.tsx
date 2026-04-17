@@ -1,15 +1,12 @@
 import {
   type Identifier,
-  useDataProvider,
   useGetIdentity,
   useGetOne,
   useGetRecordRepresentation,
   useNotify,
   useTranslate,
-  useUpdate,
 } from "ra-core";
 import { CreateSheet } from "../misc/CreateSheet";
-import { foreignKeyMapping } from "../notes/foreignKeyMapping";
 import { TaskFormContent } from "./TaskFormContent";
 import { getTaskCreateDefaults } from "./taskModel";
 import { useQueryClient } from "@tanstack/react-query";
@@ -39,31 +36,14 @@ export const TaskCreateSheet = ({
     { id: contact_id! },
     { enabled: !selectContact },
   );
-  const [update] = useUpdate();
-  const dataProvider = useDataProvider();
   const queryClient = useQueryClient();
   const notify = useNotify();
 
   if (!identity) return null;
 
-  const handleSuccess = async (data: any) => {
-    const referenceRecordId = data[foreignKeyMapping["contacts"]];
-    if (!referenceRecordId) return;
-    const { data: contact } = await dataProvider.getOne("contacts", {
-      id: referenceRecordId,
-    });
-    if (!contact) return;
-    await update("contacts", {
-      id: referenceRecordId as unknown as Identifier,
-      data: { last_seen: new Date().toISOString() },
-      previousData: contact,
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["contacts", "getOne"],
-    });
-
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["contacts", "getOne"] });
     notify("resources.tasks.added");
-    // No redirect, only close the sheet
     onOpenChange(false);
   };
 

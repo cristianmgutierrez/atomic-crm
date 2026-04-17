@@ -13,8 +13,7 @@ select
     to_json(c.*) as company,
     null::json as contact,
     null::json as deal,
-    null::json as contact_note,
-    null::json as deal_note
+    null::json as task
 from public.companies c
 union all
 select
@@ -26,23 +25,8 @@ select
     null::json as company,
     to_json(co.*) as contact,
     null::json as deal,
-    null::json as contact_note,
-    null::json as deal_note
+    null::json as task
 from public.contacts co
-union all
-select
-    ('contactNote.' || cn.id || '.created') as id,
-    'contactNote.created' as type,
-    cn.date,
-    co.company_id,
-    cn.sales_id,
-    null::json as company,
-    null::json as contact,
-    null::json as deal,
-    to_json(cn.*) as contact_note,
-    null::json as deal_note
-from public.contact_notes cn
-    left join public.contacts co on co.id = cn.contact_id
 union all
 select
     ('deal.' || d.id || '.created') as id,
@@ -53,23 +37,35 @@ select
     null::json as company,
     null::json as contact,
     to_json(d.*) as deal,
-    null::json as contact_note,
-    null::json as deal_note
+    null::json as task
 from public.deals d
 union all
 select
-    ('dealNote.' || dn.id || '.created') as id,
-    'dealNote.created' as type,
-    dn.date,
-    d.company_id,
-    dn.sales_id,
+    ('task.' || t.id || '.created') as id,
+    'task.created' as type,
+    t.created_at as date,
+    co.company_id,
+    t.sales_id,
     null::json as company,
     null::json as contact,
     null::json as deal,
-    null::json as contact_note,
-    to_json(dn.*) as deal_note
-from public.deal_notes dn
-    left join public.deals d on d.id = dn.deal_id;
+    to_json(t.*) as task
+from public.tasks t
+    left join public.contacts co on co.id = t.contact_id
+union all
+select
+    ('task.' || t.id || '.done') as id,
+    'task.done' as type,
+    t.done_date as date,
+    co.company_id,
+    t.sales_id,
+    null::json as company,
+    null::json as contact,
+    null::json as deal,
+    to_json(t.*) as task
+from public.tasks t
+    left join public.contacts co on co.id = t.contact_id
+    where t.done_date is not null;
 
 create or replace view public.companies_summary with (security_invoker = on) as
 select

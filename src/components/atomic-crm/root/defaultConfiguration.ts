@@ -41,7 +41,7 @@ export const defaultDealCategories = [
   { value: "website-design", label: "Website design" },
 ];
 
-export const defaultNoteStatuses = [
+export const defaultContactStatuses = [
   { value: "ativo", label: "Ativo", color: "#28b446" },
   { value: "inativo", label: "Inativo", color: "#8c939b" },
   { value: "prospect", label: "Prospect", color: "#f5a623" },
@@ -58,13 +58,14 @@ export const defaultTaskTypes: TaskType[] = [
   { value: "demo", label: "Demo", icon: "Monitor" },
   { value: "thank-you", label: "Agradecimento", icon: "Heart" },
   { value: "ship", label: "Envio", icon: "Package" },
+  { value: "observation", label: "Observacao", icon: "FileText" },
 ];
 
 export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
   dealCategories: defaultDealCategories,
-  noteStatuses: defaultNoteStatuses,
+  contactStatuses: defaultContactStatuses,
   taskTypes: defaultTaskTypes,
   title: defaultTitle,
   darkModeLogo: defaultDarkModeLogo,

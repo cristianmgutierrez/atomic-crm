@@ -12,16 +12,8 @@ create or replace trigger set_contact_sales_id_trigger
     before insert on public.contacts
     for each row execute function public.set_sales_id_default();
 
-create or replace trigger set_contact_notes_sales_id_trigger
-    before insert on public.contact_notes
-    for each row execute function public.set_sales_id_default();
-
 create or replace trigger set_deal_sales_id_trigger
     before insert on public.deals
-    for each row execute function public.set_sales_id_default();
-
-create or replace trigger set_deal_notes_sales_id_trigger
-    before insert on public.deal_notes
     for each row execute function public.set_sales_id_default();
 
 create or replace trigger set_task_sales_id_trigger
@@ -37,16 +29,8 @@ create or replace trigger set_contact_escritorio_id_trigger
     before insert on public.contacts
     for each row execute function public.set_escritorio_id_default();
 
-create or replace trigger set_contact_notes_escritorio_id_trigger
-    before insert on public.contact_notes
-    for each row execute function public.set_escritorio_id_default();
-
 create or replace trigger set_deal_escritorio_id_trigger
     before insert on public.deals
-    for each row execute function public.set_escritorio_id_default();
-
-create or replace trigger set_deal_notes_escritorio_id_trigger
-    before insert on public.deal_notes
     for each row execute function public.set_escritorio_id_default();
 
 create or replace trigger set_task_escritorio_id_trigger
@@ -71,31 +55,20 @@ create or replace trigger contact_saved
     before insert or update on public.contacts
     for each row execute function public.handle_contact_saved();
 
--- Update contact.last_seen when a contact note is created
-create or replace trigger on_public_contact_notes_created_or_updated
-    after insert on public.contact_notes
-    for each row execute function public.handle_contact_note_created_or_updated();
+-- Update contact.last_seen when a task is created or marked done
+create or replace trigger on_task_created_or_done
+    after insert or update of done_date on public.tasks
+    for each row execute function public.handle_task_last_seen();
 
--- Cleanup storage attachments when contact notes are updated or deleted
-create or replace trigger on_contact_notes_attachments_updated_delete_note_attachments
-    after update on public.contact_notes
+-- Cleanup storage attachments when task attachments change (reuses generic note attachments cleanup)
+create or replace trigger on_task_attachments_updated_delete_attachments
+    after update on public.tasks
     for each row
     when (old.attachments is distinct from new.attachments)
     execute function public.cleanup_note_attachments();
 
-create or replace trigger on_contact_notes_deleted_delete_note_attachments
-    after delete on public.contact_notes
-    for each row execute function public.cleanup_note_attachments();
-
--- Cleanup storage attachments when deal notes are updated or deleted
-create or replace trigger on_deal_notes_attachments_updated_delete_note_attachments
-    after update on public.deal_notes
-    for each row
-    when (old.attachments is distinct from new.attachments)
-    execute function public.cleanup_note_attachments();
-
-create or replace trigger on_deal_notes_deleted_delete_note_attachments
-    after delete on public.deal_notes
+create or replace trigger on_task_deleted_delete_attachments
+    after delete on public.tasks
     for each row execute function public.cleanup_note_attachments();
 
 -- Auth triggers: sync auth.users to public.sales

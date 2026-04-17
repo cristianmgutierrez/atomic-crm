@@ -6,6 +6,27 @@
 
 Este é um fork do Atomic CRM customizado para escritórios de investimentos do tipo **Family Office**. O objetivo é gerenciar o relacionamento com clientes (pessoas físicas e jurídicas), seus ativos e negócios, com isolamento completo de dados por escritório.
 
+## Princípios de Engenharia
+
+Estes princípios são obrigatórios em qualquer mudança neste projeto. Quando houver conflito entre conveniência e princípio, o princípio vence.
+
+### Fonte única de verdade
+- Cada dado de domínio tem UM lugar canônico. Exemplo: status do contato vive em `contacts.status` e só pode ser alterado pelo cadastro de contato — não por efeito colateral de outras telas.
+- Cópias de dados só são aceitáveis como denormalizações explícitas em views (read-only) ou em registros imutáveis (logs/auditoria) — nunca como campos editáveis paralelos.
+- Mudanças em entidades devem passar pela tela/API canônica daquela entidade.
+
+### DRY entre camadas
+- Regras de negócio (ex: atualizar `last_seen` em interações com o cliente) vivem em UMA camada. Para invariantes de dados, preferir triggers/functions no Postgres; código frontend deve apenas orquestrar a UI.
+- Se a mesma lógica aparece em frontend e backend, consolidar no backend.
+
+### Activity log unificado
+- Toda interação relevante (criação de entidades, conclusão de tarefas) deve aparecer na view `activity_log`.
+- Adicionar nova entidade interativa = UNION ALL na view `activity_log` ([supabase/schemas/03_views.sql](supabase/schemas/03_views.sql)) + handler em [ActivityLogIterator.tsx](src/components/atomic-crm/activity/ActivityLogIterator.tsx) + constante em [src/components/atomic-crm/consts.ts](src/components/atomic-crm/consts.ts).
+
+### Validação no boundary
+- Validar entrada no formulário canônico da entidade. Não confiar em "ninguém vai alterar isso por outro caminho" — projetar para que não haja outro caminho.
+- Se uma regra precisa valer para todos os caminhos de mutação, expressar como constraint do banco ou trigger, não como verificação no frontend.
+
 ## Arquitetura Multi-Escritório (Multi-Tenant)
 
 ### Modelo de dados

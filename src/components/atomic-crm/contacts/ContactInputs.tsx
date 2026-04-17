@@ -36,7 +36,7 @@ const isInstagramHandle = (value: string) => {
     };
   }
 };
-import { StatusSelector } from "../notes";
+import { ContactStatusInput } from "./ContactStatusInput";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Contact, Sale } from "../types";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
@@ -191,13 +191,13 @@ export const ContactInputs = () => {
 const Tab1PersonalInfo = () => {
   const translate = useTranslate();
   const { getValues, setValue } = useFormContext();
-  const { noteStatuses } = useConfigurationContext();
+  const { contactStatuses } = useConfigurationContext();
 
   const personType = useWatch({ name: "person_type" });
   const status = useWatch({ name: "status" });
   const isProspect = status === "prospect";
 
-  const statusChoices = noteStatuses.map((s) => ({
+  const statusChoices = contactStatuses.map((s) => ({
     id: s.value,
     name: s.label,
   }));
@@ -855,7 +855,7 @@ export const ContactStatusSelector = () => {
 
   return (
     <div className="[&_button]:w-auto">
-      <StatusSelector
+      <ContactStatusInput
         status={record?.status}
         setStatus={handleStatusChange}
         triggerClassName="w-full"

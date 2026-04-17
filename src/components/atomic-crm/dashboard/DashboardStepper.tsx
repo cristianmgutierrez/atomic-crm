@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { ContactImportButton } from "../contacts/ContactImportButton";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
-import { NoteCreateSheet } from "../notes/NoteCreateSheet";
+import { TaskCreateSheet } from "../tasks/TaskCreateSheet";
 import useAppBarHeight from "../misc/useAppBarHeight";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -25,16 +25,16 @@ export const DashboardStepper = ({
   const appbarHeight = useAppBarHeight();
   const isMobile = useIsMobile();
   const [contactCreateOpen, setContactCreateOpen] = useState(false);
-  const [noteCreateOpen, setNoteCreateOpen] = useState(false);
+  const [taskCreateOpen, setTaskCreateOpen] = useState(false);
   return (
     <>
       <ContactCreateSheet
         open={contactCreateOpen}
         onOpenChange={setContactCreateOpen}
       />
-      <NoteCreateSheet
-        open={noteCreateOpen}
-        onOpenChange={setNoteCreateOpen}
+      <TaskCreateSheet
+        open={taskCreateOpen}
+        onOpenChange={setTaskCreateOpen}
         contact_id={contactId}
       />
       <div
@@ -112,31 +112,31 @@ export const DashboardStepper = ({
                 <Circle className="text-muted-foreground w-5 h-5 mt-1 shrink-0" />
                 <div className="flex flex-col gap-4">
                   <h4 className="font-bold">
-                    {translate("resources.notes.action.add_first", {
-                      _: "Add your first note",
+                    {translate("resources.tasks.action.add_first", {
+                      _: "Adicione sua primeira atividade",
                     })}
                   </h4>
                   <p>
-                    {translate("resources.notes.stepper.hint", {
-                      _: "Go to a contact page and add a note",
+                    {translate("resources.tasks.stepper.hint", {
+                      _: "Vá até a página de um contato e crie uma atividade",
                     })}
                   </p>
                   {isMobile ? (
                     <Button
-                      onClick={() => setNoteCreateOpen(true)}
+                      onClick={() => setTaskCreateOpen(true)}
                       disabled={step < 2}
                       className="w-[100px] gap-2"
                     >
                       <Plus className="h-4 w-4" />
-                      {translate("resources.notes.action.add", {
-                        _: "Add note",
+                      {translate("resources.tasks.action.add", {
+                        _: "Nova atividade",
                       })}
                     </Button>
                   ) : (
                     <Button asChild disabled={step < 2} className="w-[100px]">
                       <Link role="button" to={`/contacts/${contactId}/show`}>
-                        {translate("resources.notes.action.add", {
-                          _: "Add note",
+                        {translate("resources.tasks.action.add", {
+                          _: "Nova atividade",
                         })}
                       </Link>
                     </Button>

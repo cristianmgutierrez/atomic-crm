@@ -41,13 +41,17 @@ const SECTIONS = [
     label: "resources.companies.name",
     fallback: "Companies",
   },
+  {
+    id: "contacts",
+    label: "resources.contacts.name",
+    fallback: "Contacts",
+  },
   { id: "deals", label: "resources.deals.name", fallback: "Deals" },
   {
     id: "pipelines",
     label: "crm.settings.sections.pipelines",
     fallback: "Funis",
   },
-  { id: "notes", label: "resources.notes.name", fallback: "Notes" },
   { id: "tasks", label: "resources.tasks.name", fallback: "Tasks" },
 ];
 
@@ -132,7 +136,7 @@ const transformFormValues = (data: Record<string, any>) => ({
     companySectors: ensureValues(data.companySectors),
     dealCategories: ensureValues(data.dealCategories),
     taskTypes: ensureValues(data.taskTypes),
-    noteStatuses: ensureValues(data.noteStatuses),
+    contactStatuses: ensureValues(data.contactStatuses),
   } as ConfigurationContextValue,
 });
 
@@ -178,7 +182,7 @@ const SettingsForm = () => {
       companySectors: config.companySectors,
       dealCategories: config.dealCategories,
       taskTypes: config.taskTypes,
-      noteStatuses: config.noteStatuses,
+      contactStatuses: config.contactStatuses,
     }),
     [config],
   );
@@ -350,18 +354,24 @@ const SettingsFormFields = () => {
         {/* Pipelines — managed separately (own CRUD resource) */}
         <PipelinesSettings />
 
-        {/* Notes */}
-        <Card id="notes">
+        {/* Contacts */}
+        <Card id="contacts">
           <CardContent className="space-y-4">
             <h2 className="text-xl font-semibold text-muted-foreground">
-              {translate("resources.notes.name", {
+              {translate("resources.contacts.name", {
                 smart_count: 2,
               })}
             </h2>
             <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.notes.statuses")}
+              {translate("crm.settings.contacts.statuses", {
+                _: "Status",
+              })}
             </h3>
-            <ArrayInput source="noteStatuses" label={false} helperText={false}>
+            <ArrayInput
+              source="contactStatuses"
+              label={false}
+              helperText={false}
+            >
               <SimpleFormIterator inline disableReordering disableClear>
                 <TextInput source="label" label={false} className="flex-1" />
                 <ColorInput source="color" />

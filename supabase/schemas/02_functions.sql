@@ -180,13 +180,33 @@ begin
 end;
 $$;
 
-CREATE OR REPLACE FUNCTION "public"."handle_contact_note_created_or_updated"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "public"."handle_task_last_seen"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
     AS $$
+declare
+    seen_at timestamp with time zone;
 begin
-  update public.contacts set last_seen = new.date where contacts.id = new.contact_id and contacts.last_seen < new.date;
-  return new;
+    if new.contact_id is null then
+        return new;
+    end if;
+
+    if TG_OP = 'INSERT' then
+        seen_at := coalesce(new.done_date, now());
+    elsif TG_OP = 'UPDATE' then
+        if old.done_date is null and new.done_date is not null then
+            seen_at := new.done_date;
+        else
+            return new;
+        end if;
+    end if;
+
+    update public.contacts
+    set last_seen = seen_at
+    where id = new.contact_id
+    and (last_seen is null or last_seen < seen_at);
+
+    return new;
 end;
 $$;
 
@@ -301,13 +321,10 @@ BEGIN
     RAISE EXCEPTION 'Contact not found';
   END IF;
 
-  -- 1. Reassign tasks from loser to winner
+  -- 1. Reassign tasks (including observations) from loser to winner
   UPDATE tasks SET contact_id = winner_id WHERE contact_id = loser_id;
 
-  -- 2. Reassign contact notes from loser to winner
-  UPDATE contact_notes SET contact_id = winner_id WHERE contact_id = loser_id;
-
-  -- 3. Update deals - replace loser with winner in contact_ids array
+  -- 2. Update deals - replace loser with winner in contact_ids array
   FOR deal_record IN
     SELECT id, contact_ids
     FROM deals
@@ -324,7 +341,7 @@ BEGIN
     WHERE id = deal_record.id;
   END LOOP;
 
-  -- 4. Merge contact data
+  -- 3. Merge contact data
 
   -- Get email arrays
   winner_emails := COALESCE(winner_contact.email_jsonb, '[]'::jsonb);
@@ -401,7 +418,7 @@ BEGIN
     )
   );
 
-  -- 5. Update winner with merged data
+  -- 4. Update winner with merged data
   UPDATE contacts SET
     avatar = COALESCE(winner_contact.avatar, loser_contact.avatar),
     gender = COALESCE(winner_contact.gender, loser_contact.gender),
@@ -458,7 +475,7 @@ BEGIN
     address_notes = COALESCE(winner_contact.address_notes, loser_contact.address_notes)
   WHERE id = winner_id;
 
-  -- 6. Delete loser contact
+  -- 5. Delete loser contact
   DELETE FROM contacts WHERE id = loser_id;
 
   RETURN winner_id;

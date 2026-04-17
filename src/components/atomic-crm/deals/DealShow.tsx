@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { isValid } from "date-fns";
 import { Archive, ArchiveRestore } from "lucide-react";
 import {
-  InfiniteListBase,
   ShowBase,
   useDataProvider,
   useNotify,
@@ -22,8 +21,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
 import { CompanyAvatar } from "../companies/CompanyAvatar";
-import { NoteCreate } from "../notes/NoteCreate";
-import { NotesIterator } from "../notes/NotesIterator";
+import { DealTasksPanel } from "../tasks/DealTasksPanel";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { usePipelines } from "../pipelines/usePipelines";
 import type { Deal } from "../types";
@@ -173,17 +171,7 @@ const DealShowContent = () => {
 
           <div className="m-4">
             <Separator className="mb-4" />
-            <InfiniteListBase
-              resource="deal_notes"
-              filter={{ deal_id: record.id }}
-              sort={{ field: "date", order: "DESC" }}
-              perPage={25}
-              disableSyncWithLocation
-              storeKey={false}
-              empty={<NoteCreate reference={"deals"} />}
-            >
-              <NotesIterator reference="deals" />
-            </InfiniteListBase>
+            <DealTasksPanel />
           </div>
         </div>
       </div>

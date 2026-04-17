@@ -21,6 +21,7 @@ import {
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal, Sale, Task } from "../types";
+import { TaskAttachments } from "./TaskAttachments";
 import { TaskEdit } from "./TaskEdit";
 import { getTaskTypeWithIcon } from "./taskModel";
 
@@ -214,6 +215,10 @@ export const TaskTimelineItem = ({
             )}
 
             {company && <span>· {company.name}</span>}
+          </div>
+
+          <div className="pl-6">
+            <TaskAttachments task={task} />
           </div>
         </div>
       </div>

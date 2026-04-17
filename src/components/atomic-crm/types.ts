@@ -4,9 +4,9 @@ import type { ComponentType } from "react";
 import type {
   COMPANY_CREATED,
   CONTACT_CREATED,
-  CONTACT_NOTE_CREATED,
   DEAL_CREATED,
-  DEAL_NOTE_CREATED,
+  TASK_CREATED,
+  TASK_DONE,
 } from "./consts";
 
 export type SignUpData = {
@@ -145,15 +145,6 @@ export type Contact = {
   address_notes?: string | null;
 } & Pick<RaRecord, "id">;
 
-export type ContactNote = {
-  contact_id: Identifier;
-  text: string;
-  date: string;
-  sales_id: Identifier;
-  status: string;
-  attachments?: AttachmentNote[];
-} & Pick<RaRecord, "id">;
-
 export type Pipeline = {
   name: string;
   stages: DealStage[];
@@ -180,17 +171,6 @@ export type Deal = {
   index: number;
 } & Pick<RaRecord, "id">;
 
-export type DealNote = {
-  deal_id: Identifier;
-  text: string;
-  date: string;
-  sales_id: Identifier;
-  attachments?: AttachmentNote[];
-
-  // This is defined for compatibility with `ContactNote`
-  status?: undefined;
-} & Pick<RaRecord, "id">;
-
 export type Tag = {
   id: number;
   name: string;
@@ -206,8 +186,8 @@ export type TaskType = {
 export type Task = {
   contact_id: Identifier;
   type: string;
-  text: string;
-  due_date: string;
+  text?: string | null;
+  due_date?: string | null;
   start_time?: string | null;
   end_time?: string | null;
   end_date?: string | null;
@@ -216,6 +196,8 @@ export type Task = {
   done_date?: string | null;
   sales_id?: Identifier;
   source?: string | null;
+  attachments?: AttachmentNote[] | null;
+  created_at?: string;
 } & Pick<RaRecord, "id">;
 
 export type ActivityCompanyCreated = {
@@ -234,13 +216,6 @@ export type ActivityContactCreated = {
   date: string;
 } & Pick<RaRecord, "id">;
 
-export type ActivityContactNoteCreated = {
-  type: typeof CONTACT_NOTE_CREATED;
-  sales_id?: Identifier;
-  contactNote: ContactNote;
-  date: string;
-} & Pick<RaRecord, "id">;
-
 export type ActivityDealCreated = {
   type: typeof DEAL_CREATED;
   company_id: Identifier;
@@ -249,10 +224,19 @@ export type ActivityDealCreated = {
   date: string;
 };
 
-export type ActivityDealNoteCreated = {
-  type: typeof DEAL_NOTE_CREATED;
+export type ActivityTaskCreated = {
+  type: typeof TASK_CREATED;
+  company_id?: Identifier | null;
   sales_id?: Identifier;
-  dealNote: DealNote;
+  task: Task;
+  date: string;
+};
+
+export type ActivityTaskDone = {
+  type: typeof TASK_DONE;
+  company_id?: Identifier | null;
+  sales_id?: Identifier;
+  task: Task;
   date: string;
 };
 
@@ -260,9 +244,9 @@ export type Activity = RaRecord &
   (
     | ActivityCompanyCreated
     | ActivityContactCreated
-    | ActivityContactNoteCreated
     | ActivityDealCreated
-    | ActivityDealNoteCreated
+    | ActivityTaskCreated
+    | ActivityTaskDone
   );
 
 export interface RAFile {
@@ -282,7 +266,7 @@ export interface LabeledValue {
 
 export type DealStage = LabeledValue;
 
-export interface NoteStatus extends LabeledValue {
+export interface ContactStatus extends LabeledValue {
   color: string;
 }
 

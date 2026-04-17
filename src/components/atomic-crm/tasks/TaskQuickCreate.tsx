@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useRecordContext } from "ra-core";
+import type { Identifier } from "ra-core";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -12,10 +12,17 @@ import {
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { getTaskTypeIcon } from "./TaskTypeIconBar";
 import { AddTask } from "./AddTask";
-import type { Contact } from "../types";
 
-export const TaskQuickCreate = () => {
-  const record = useRecordContext<Contact>();
+export type TaskQuickCreateDefaults = {
+  contact_id?: Identifier;
+  deal_id?: Identifier;
+};
+
+export const TaskQuickCreate = ({
+  defaults,
+}: {
+  defaults?: TaskQuickCreateDefaults;
+}) => {
   const { taskTypes } = useConfigurationContext();
   const [type, setType] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -34,8 +41,6 @@ export const TaskQuickCreate = () => {
       setText("");
     }
   };
-
-  if (!record) return null;
 
   return (
     <div className="border rounded-lg p-3 bg-card mb-4">
@@ -86,7 +91,12 @@ export const TaskQuickCreate = () => {
       <AddTask
         open={dialogOpen}
         onOpenChange={handleOpenChange}
-        initialValues={{ type: type ?? undefined, text }}
+        initialValues={{
+          type: type ?? undefined,
+          text,
+          contact_id: defaults?.contact_id,
+          deal_id: defaults?.deal_id,
+        }}
       />
     </div>
   );

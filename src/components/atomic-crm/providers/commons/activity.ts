@@ -3,20 +3,13 @@ import type { DataProvider, Identifier } from "ra-core";
 import {
   COMPANY_CREATED,
   CONTACT_CREATED,
-  CONTACT_NOTE_CREATED,
   DEAL_CREATED,
-  DEAL_NOTE_CREATED,
+  TASK_CREATED,
+  TASK_DONE,
 } from "../../consts";
-import type {
-  Activity,
-  Company,
-  Contact,
-  ContactNote,
-  Deal,
-  DealNote,
-} from "../../types";
+import type { Activity, Company, Contact, Deal, Task } from "../../types";
 
-// FIXME: Requires 5 large queries to get the latest activities.
+// FIXME: Requires multiple large queries to get the latest activities.
 // Replace with a server-side view or a custom API endpoint.
 export async function getActivityLog(
   dataProvider: DataProvider,
@@ -37,14 +30,15 @@ export async function getActivityLog(
     filter["sales_id@in"] = `(${salesId})`;
   }
 
-  const [newCompanies, newContactsAndNotes, newDealsAndNotes] =
+  const [newCompanies, newContacts, newDeals, newTaskActivities] =
     await Promise.all([
       getNewCompanies(dataProvider, companyFilter),
-      getNewContactsAndNotes(dataProvider, filter),
-      getNewDealsAndNotes(dataProvider, filter),
+      getNewContacts(dataProvider, filter),
+      getNewDeals(dataProvider, filter),
+      getTaskActivities(dataProvider, filter),
     ]);
   return (
-    [...newCompanies, ...newContactsAndNotes, ...newDealsAndNotes]
+    [...newCompanies, ...newContacts, ...newDeals, ...newTaskActivities]
       // sort by date desc
       .sort(
         (a, b) =>
@@ -76,7 +70,7 @@ const getNewCompanies = async (
   }));
 };
 
-async function getNewContactsAndNotes(
+async function getNewContacts(
   dataProvider: DataProvider,
   filter: any,
 ): Promise<Activity[]> {
@@ -86,27 +80,7 @@ async function getNewContactsAndNotes(
     sort: { field: "first_seen", order: "DESC" },
   });
 
-  const recentContactNotesFilter = {} as any;
-  if (filter.sales_id) {
-    recentContactNotesFilter.sales_id = filter.sales_id;
-  }
-  if (filter.company_id) {
-    // No company_id field in contactNote, filtering by related contacts instead.
-    // This filter is only valid if a company has less than 250 contact.
-    const contactIds = contacts.map((contact) => contact.id).join(",");
-    recentContactNotesFilter["contact_id@in"] = `(${contactIds})`;
-  }
-
-  const { data: contactNotes } = await dataProvider.getList<ContactNote>(
-    "contact_notes",
-    {
-      filter: recentContactNotesFilter,
-      pagination: { page: 1, perPage: 250 },
-      sort: { field: "date", order: "DESC" },
-    },
-  );
-
-  const newContacts = contacts.map((contact) => ({
+  return contacts.map((contact) => ({
     id: `contact.${contact.id}.created`,
     type: CONTACT_CREATED,
     company_id: contact.company_id,
@@ -114,19 +88,9 @@ async function getNewContactsAndNotes(
     contact,
     date: contact.first_seen,
   }));
-
-  const newContactNotes = contactNotes.map((contactNote) => ({
-    id: `contactNote.${contactNote.id}.created`,
-    type: CONTACT_NOTE_CREATED,
-    sales_id: contactNote.sales_id,
-    contactNote,
-    date: contactNote.date,
-  }));
-
-  return [...newContacts, ...newContactNotes];
 }
 
-async function getNewDealsAndNotes(
+async function getNewDeals(
   dataProvider: DataProvider,
   filter: any,
 ): Promise<Activity[]> {
@@ -136,27 +100,7 @@ async function getNewDealsAndNotes(
     sort: { field: "created_at", order: "DESC" },
   });
 
-  const recentDealNotesFilter = {} as any;
-  if (filter.sales_id) {
-    recentDealNotesFilter.sales_id = filter.sales_id;
-  }
-  if (filter.company_id) {
-    // No company_id field in dealNote, filtering by related deals instead.
-    // This filter is only valid if a deal has less than 250 notes.
-    const dealIds = deals.map((deal) => deal.id).join(",");
-    recentDealNotesFilter["deal_id@in"] = `(${dealIds})`;
-  }
-
-  const { data: dealNotes } = await dataProvider.getList<DealNote>(
-    "deal_notes",
-    {
-      filter: recentDealNotesFilter,
-      pagination: { page: 1, perPage: 250 },
-      sort: { field: "date", order: "DESC" },
-    },
-  );
-
-  const newDeals = deals.map((deal) => ({
+  return deals.map((deal) => ({
     id: `deal.${deal.id}.created`,
     type: DEAL_CREATED,
     company_id: deal.company_id,
@@ -164,14 +108,47 @@ async function getNewDealsAndNotes(
     deal,
     date: deal.created_at,
   }));
+}
 
-  const newDealNotes = dealNotes.map((dealNote) => ({
-    id: `dealNote.${dealNote.id}.created`,
-    type: DEAL_NOTE_CREATED,
-    sales_id: dealNote.sales_id,
-    dealNote,
-    date: dealNote.date,
-  }));
+async function getTaskActivities(
+  dataProvider: DataProvider,
+  filter: any,
+): Promise<Activity[]> {
+  const tasksFilter = {} as any;
+  if (filter.sales_id || filter["sales_id@in"]) {
+    if (filter.sales_id) tasksFilter.sales_id = filter.sales_id;
+    if (filter["sales_id@in"])
+      tasksFilter["sales_id@in"] = filter["sales_id@in"];
+  }
 
-  return [...newDeals, ...newDealNotes];
+  const { data: tasks } = await dataProvider.getList<Task>("tasks", {
+    filter: tasksFilter,
+    pagination: { page: 1, perPage: 500 },
+    sort: { field: "id", order: "DESC" },
+  });
+
+  const activities: Activity[] = [];
+  for (const task of tasks) {
+    if (task.done_date) {
+      activities.push({
+        id: `task.${task.id}.done`,
+        type: TASK_DONE,
+        sales_id: task.sales_id,
+        task,
+        date: task.done_date,
+      });
+    }
+    const createdDate =
+      task.created_at ?? task.due_date ?? task.done_date ?? undefined;
+    if (createdDate) {
+      activities.push({
+        id: `task.${task.id}.created`,
+        type: TASK_CREATED,
+        sales_id: task.sales_id,
+        task,
+        date: createdDate,
+      });
+    }
+  }
+  return activities;
 }

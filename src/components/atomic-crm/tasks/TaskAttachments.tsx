@@ -1,24 +1,16 @@
 import { Paperclip } from "lucide-react";
 
-import type { AttachmentNote, ContactNote, DealNote } from "../types";
+import type { AttachmentNote, Task } from "../types";
 
-/**
- * Displays persisted note attachments in note show/list views.
- *
- * This component receives a full note record and renders all attachments.
- *
- * @param props.note - Note record containing attachments to render.
- * @returns `null` when there are no attachments, otherwise attachment previews and links.
- */
-export const NoteAttachments = ({ note }: { note: ContactNote | DealNote }) => {
-  if (!note.attachments || note.attachments.length === 0) {
+export const TaskAttachments = ({ task }: { task: Task }) => {
+  if (!task.attachments || task.attachments.length === 0) {
     return null;
   }
 
-  const imageAttachments = note.attachments.filter(
+  const imageAttachments = task.attachments.filter(
     (attachment: AttachmentNote) => isImageMimeType(attachment.type),
   );
-  const otherAttachments = note.attachments.filter(
+  const otherAttachments = task.attachments.filter(
     (attachment: AttachmentNote) => !isImageMimeType(attachment.type),
   );
 
@@ -65,12 +57,6 @@ export const NoteAttachments = ({ note }: { note: ContactNote | DealNote }) => {
   );
 };
 
-/**
- * Checks whether a mime type corresponds to an image.
- *
- * @param mimeType - The attachment mime type.
- * @returns `true` when the mime type starts with `image/`.
- */
 const isImageMimeType = (mimeType?: string): boolean => {
   if (!mimeType) {
     return false;

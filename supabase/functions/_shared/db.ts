@@ -40,20 +40,13 @@ export interface ContactsTable {
 interface TasksTable {
   id: Generated<number>;
   contact_id: number;
+  deal_id: number | null;
   type: string | null;
   text: string | null;
+  notes: string | null;
   due_date: Date;
   done_date: Date | null;
   sales_id: number | null;
-}
-
-interface ContactNotesTable {
-  id: Generated<number>;
-  contact_id: number;
-  text: string | null;
-  date: Date | null;
-  sales_id: number | null;
-  status: string | null;
   attachments: unknown[] | null; // JSONB array
 }
 
@@ -77,7 +70,6 @@ interface DealsTable {
 interface Database {
   contacts: ContactsTable;
   tasks: TasksTable;
-  contact_notes: ContactNotesTable;
   deals: DealsTable;
 }
 

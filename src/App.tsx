@@ -11,7 +11,7 @@ import { CRM } from "@/components/atomic-crm/root/CRM";
  *  - dealStages
  *  - lightTheme
  *  - logo
- *  - noteStatuses
+ *  - contactStatuses
  *  - taskTypes
  *  - title
  * ... as well as all the props accepted by shadcn-admin-kit's <Admin> component.

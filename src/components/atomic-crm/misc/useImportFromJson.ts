@@ -477,12 +477,13 @@ export const useImportFromJson = (): [
           }
         }
 
-        await dataProvider.create("contact_notes", {
+        await dataProvider.create("tasks", {
           data: {
             contact_id: idsMaps.contacts[dataToImport.contact_id],
             sales_id: idsMaps.sales[dataToImport.sales_id] ?? currentSale.id,
-            text: dataToImport.text,
-            date: dataToImport.date,
+            type: "observation",
+            notes: dataToImport.text,
+            done_date: dataToImport.date,
             attachments,
           },
         });

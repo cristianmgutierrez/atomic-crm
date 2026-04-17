@@ -112,7 +112,7 @@ The `src/App.tsx` file renders the `<CRM>` component, which accepts props for do
 - `contactGender`: Gender options
 - `companySectors`: Company industry sectors
 - `dealCategories`, `dealStages`, `dealPipelineStatuses`: Deal configuration
-- `noteStatuses`: Note status options with colors
+- `contactStatuses`: Contact status options with colors
 - `taskTypes`: Task type options
 - `logo`, `title`: Branding
 - `lightTheme`, `darkTheme`: Theme customization

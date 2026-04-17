@@ -11,7 +11,6 @@ import { useTranslate } from "ra-core";
 import { Link, matchPath, useLocation, useMatch } from "react-router";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
 import { useState } from "react";
-import { NoteCreateSheet } from "../notes/NoteCreateSheet";
 import { TaskCreateSheet } from "../tasks/TaskCreateSheet";
 
 export const MobileNavigation = () => {
@@ -112,7 +111,6 @@ const CreateButton = () => {
   const translate = useTranslate();
   const contact_id = useMatch("/contacts/:id/*")?.params.id;
   const [contactCreateOpen, setContactCreateOpen] = useState(false);
-  const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [taskCreateOpen, setTaskCreateOpen] = useState(false);
 
   return (
@@ -120,11 +118,6 @@ const CreateButton = () => {
       <ContactCreateSheet
         open={contactCreateOpen}
         onOpenChange={setContactCreateOpen}
-      />
-      <NoteCreateSheet
-        open={noteCreateOpen}
-        onOpenChange={setNoteCreateOpen}
-        contact_id={contact_id}
       />
       <TaskCreateSheet
         open={taskCreateOpen}
@@ -150,14 +143,6 @@ const CreateButton = () => {
             }}
           >
             {translate("resources.contacts.forcedCaseName")}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="h-12 px-4 text-base"
-            onSelect={() => {
-              setNoteCreateOpen(true);
-            }}
-          >
-            {translate("resources.notes.forcedCaseName")}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="h-12 px-4 text-base"
