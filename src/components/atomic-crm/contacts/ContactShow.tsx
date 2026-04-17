@@ -198,6 +198,15 @@ const ContactShowContentMobile = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold">
+                  {translate("resources.tags.name", { smart_count: 2 })}
+                </h3>
+                <Separator />
+                <div className="mt-3">
+                  <TagsListEdit />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">
                   {translate(
                     "resources.contacts.field_categories.personal_info",
                   )}
@@ -216,15 +225,6 @@ const ContactShowContentMobile = () => {
                 <Separator />
                 <div className="mt-3">
                   <ContactBackgroundInfo />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold">
-                  {translate("resources.tags.name", { smart_count: 2 })}
-                </h3>
-                <Separator />
-                <div className="mt-3">
-                  <TagsListEdit />
                 </div>
               </div>
             </div>

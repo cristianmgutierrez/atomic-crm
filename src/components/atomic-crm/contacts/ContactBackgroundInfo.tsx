@@ -50,34 +50,10 @@ export const ContactBackgroundInfo = () => {
           ) : null
         }
       />
-      <div className="text-muted-foreground md:py-0.5">
-        <span className="text-sm">
-          {translate("resources.contacts.background.added_on", {
-            date: formattedFirstSeen,
-          })}
-        </span>{" "}
-      </div>
-
-      <div className="text-muted-foreground md:py-0.5">
-        <span className="text-sm">
-          {translate("resources.contacts.background.last_activity_on", {
-            date: formattedLastSeen,
-          })}
-        </span>
-      </div>
-
-      <div className="inline-flex text-muted-foreground text-sm md:py-0.5">
-        {translate(
-          isCurrentUser
-            ? "resources.contacts.background.followed_by_you"
-            : "resources.contacts.background.followed_by",
-          { name: salesName },
-        )}
-      </div>
 
       {/* Perfil do Investidor */}
       {hasInvestorInfo && (
-        <div className="mt-3 pt-3 border-t">
+        <div className="mt-1">
           <div className="flex items-center gap-1 mb-1 text-muted-foreground">
             <TrendingUp className="w-3 h-3" />
             <span className="text-xs font-medium uppercase tracking-wide">
@@ -108,13 +84,51 @@ export const ContactBackgroundInfo = () => {
             )}
             {record.relationship_start_date && (
               <span>
-                Relacionamento desde: {record.relationship_start_date}
+                Relacionamento desde:{" "}
+                {formatLocalizedDate(record.relationship_start_date, locale)}
               </span>
             )}
             {record.origin && <span>Origem: {record.origin}</span>}
           </div>
         </div>
       )}
+
+      {/* Cross Sell */}
+      {record.cross_sell_opportunities &&
+        record.cross_sell_opportunities.length > 0 && (
+          <div className="mt-2 pt-2 border-t text-sm text-muted-foreground">
+            <span className="font-medium">Cross Sell: </span>
+            {record.cross_sell_opportunities.join(", ")}
+          </div>
+        )}
+
+      {/* Adicionado em / Última atividade / Seguido por */}
+      <div className="mt-2 pt-2 border-t">
+        <div className="text-muted-foreground md:py-0.5">
+          <span className="text-sm">
+            {translate("resources.contacts.background.added_on", {
+              date: formattedFirstSeen,
+            })}
+          </span>{" "}
+        </div>
+
+        <div className="text-muted-foreground md:py-0.5">
+          <span className="text-sm">
+            {translate("resources.contacts.background.last_activity_on", {
+              date: formattedLastSeen,
+            })}
+          </span>
+        </div>
+
+        <div className="inline-flex text-muted-foreground text-sm md:py-0.5">
+          {translate(
+            isCurrentUser
+              ? "resources.contacts.background.followed_by_you"
+              : "resources.contacts.background.followed_by",
+            { name: salesName },
+          )}
+        </div>
+      </div>
 
       {/* Endereço */}
       {hasAddress && (
@@ -141,15 +155,6 @@ export const ContactBackgroundInfo = () => {
           </div>
         </div>
       )}
-
-      {/* Cross Sell */}
-      {record.cross_sell_opportunities &&
-        record.cross_sell_opportunities.length > 0 && (
-          <div className="mt-2 pt-2 border-t text-sm text-muted-foreground">
-            <span className="font-medium">Cross Sell: </span>
-            {record.cross_sell_opportunities.join(", ")}
-          </div>
-        )}
 
       {/* Internal Notes */}
       {record.internal_notes && (

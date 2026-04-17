@@ -36,6 +36,12 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
       </AsideSection>
 
       <AsideSection
+        title={translate("resources.tags.name", { smart_count: 2 })}
+      >
+        <TagsListEdit />
+      </AsideSection>
+
+      <AsideSection
         title={translate("resources.contacts.field_categories.personal_info")}
       >
         <ContactPersonalInfo />
@@ -45,12 +51,6 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
         title={translate("resources.contacts.field_categories.background_info")}
       >
         <ContactBackgroundInfo />
-      </AsideSection>
-
-      <AsideSection
-        title={translate("resources.tags.name", { smart_count: 2 })}
-      >
-        <TagsListEdit />
       </AsideSection>
 
       <AsideSection

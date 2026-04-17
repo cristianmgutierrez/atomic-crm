@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { useRecordContext, useTranslate, WithRecord } from "ra-core";
+import {
+  useLocaleState,
+  useRecordContext,
+  useTranslate,
+  WithRecord,
+} from "ra-core";
+import { formatLocalizedDate } from "../misc/RelativeDate";
 import { ArrayField } from "@/components/admin/array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
 import { TextField } from "@/components/admin/text-field";
@@ -26,6 +32,7 @@ import type { Contact } from "../types";
 export const ContactPersonalInfo = () => {
   const record = useRecordContext<Contact>();
   const translate = useTranslate();
+  const [locale = "en"] = useLocaleState();
 
   if (!record) return null;
 
@@ -133,7 +140,7 @@ export const ContactPersonalInfo = () => {
           icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}
           primary={
             <span className="text-sm text-muted-foreground">
-              {record.person_type ?? "Doc"}: {record.document}
+              {record.person_type === "PJ" ? "CNPJ" : "CPF"}: {record.document}
             </span>
           }
         />
@@ -148,7 +155,7 @@ export const ContactPersonalInfo = () => {
               {translate("resources.contacts.fields.date_of_birth", {
                 _: "Nascimento",
               })}
-              : {record.date_of_birth}
+              : {formatLocalizedDate(record.date_of_birth, locale)}
             </span>
           }
         />
