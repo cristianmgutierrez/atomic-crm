@@ -23,7 +23,11 @@ export function SalesInputs() {
         validate={[required(), email()]}
         helperText={false}
       />
-      <ReferenceInput source="escritorio_id" reference="escritorios">
+      <ReferenceInput
+        source="escritorio_id"
+        reference="escritorios"
+        sort={{ field: "name", order: "ASC" }}
+      >
         <SelectInput optionText="name" label="Escritório" helperText={false} />
       </ReferenceInput>
       <SelectInput
