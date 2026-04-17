@@ -1,5 +1,5 @@
 import type { ConfigurationContextValue } from "./ConfigurationContext";
-import type { TaskType } from "../types";
+import type { CalendarSettings, TaskType } from "../types";
 
 export const defaultDarkModeLogo = "./logos/logo_atomic_crm_dark.svg";
 export const defaultLightModeLogo = "./logos/logo_atomic_crm_light.svg";
@@ -61,12 +61,21 @@ export const defaultTaskTypes: TaskType[] = [
   { value: "observation", label: "Observacao", icon: "FileText" },
 ];
 
+export const defaultCalendarSettings: CalendarSettings = {
+  slotInterval: 30,
+  dayStartHour: 8,
+  dayEndHour: 20,
+  weekStartsOn: 0,
+  defaultDurationMin: 30,
+};
+
 export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
   dealCategories: defaultDealCategories,
   contactStatuses: defaultContactStatuses,
   taskTypes: defaultTaskTypes,
+  calendarSettings: defaultCalendarSettings,
   title: defaultTitle,
   darkModeLogo: defaultDarkModeLogo,
   lightModeLogo: defaultLightModeLogo,

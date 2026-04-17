@@ -29,6 +29,8 @@ const getBaseAuthProvider = () =>
         id: sale.id,
         fullName: `${sale.first_name} ${sale.last_name}`,
         avatar: avatarSrc,
+        papel: sale.papel,
+        escritorio_id: sale.escritorio_id,
       };
     },
   });
@@ -81,7 +83,9 @@ const getSale = async () => {
 
   const { data: dataSale, error: errorSale } = await getSupabaseClient()
     .from("sales")
-    .select("id, first_name, last_name, avatar, administrator")
+    .select(
+      "id, first_name, last_name, avatar, administrator, papel, escritorio_id",
+    )
     .match({ user_id: dataSession?.session?.user.id })
     .single();
 
@@ -97,6 +101,8 @@ const getSale = async () => {
       first_name: dataSale.first_name,
       last_name: dataSale.last_name,
       administrator: dataSale.administrator,
+      papel: dataSale.papel,
+      escritorio_id: dataSale.escritorio_id,
     };
     storage?.setItem(CURRENT_SALE_CACHE_KEY, JSON.stringify(cacheData));
   } catch {

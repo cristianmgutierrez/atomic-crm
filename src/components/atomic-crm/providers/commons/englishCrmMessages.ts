@@ -374,6 +374,24 @@ export const englishCrmMessages = {
         end_date_before_start: "End date cannot be before start date",
         end_time_before_start: "End time must be after start time",
       },
+      agenda: {
+        title: "Daily agenda",
+        show: "Show agenda",
+        previous_day: "Previous day",
+        next_day: "Next day",
+        today: "Today",
+        empty: "No events this day",
+      },
+      view: {
+        list: "List",
+        calendar: "Calendar",
+      },
+      calendar: {
+        previous_week: "Previous week",
+        next_week: "Next week",
+        today: "Today",
+        all_day: "All day",
+      },
     },
     tags: {
       name: "Tag |||| Tags",
@@ -526,6 +544,17 @@ export const englishCrmMessages = {
       sections: {
         branding: "Branding",
         pipelines: "Pipelines",
+        agenda: "Agenda",
+      },
+      agenda: {
+        slot_interval: "Slot interval",
+        slot_interval_help: "Duration of each time row in the agenda",
+        day_start_hour: "Day start",
+        day_end_hour: "Day end",
+        week_starts_on: "First day of the week",
+        default_duration: "Default event duration (min)",
+        sunday: "Sunday",
+        monday: "Monday",
       },
       pipelines: {
         add: "Add Pipeline",

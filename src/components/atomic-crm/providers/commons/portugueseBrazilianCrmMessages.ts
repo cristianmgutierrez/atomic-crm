@@ -411,6 +411,24 @@ export const portugueseBrazilianCrmMessages = {
         end_date_before_start: "Data fim não pode ser anterior à data início",
         end_time_before_start: "Hora fim deve ser posterior à hora início",
       },
+      agenda: {
+        title: "Agenda do dia",
+        show: "Ver agenda",
+        previous_day: "Dia anterior",
+        next_day: "Próximo dia",
+        today: "Hoje",
+        empty: "Nenhum compromisso neste dia",
+      },
+      view: {
+        list: "Lista",
+        calendar: "Calendário",
+      },
+      calendar: {
+        previous_week: "Semana anterior",
+        next_week: "Próxima semana",
+        today: "Hoje",
+        all_day: "Dia todo",
+      },
     },
     tags: {
       name: "Etiqueta |||| Etiquetas",
@@ -556,12 +574,23 @@ export const portugueseBrazilianCrmMessages = {
       tasks: {
         types: "Tipos",
       },
+      agenda: {
+        slot_interval: "Intervalo do slot",
+        slot_interval_help: "Duração de cada linha de horário na agenda",
+        day_start_hour: "Início do dia",
+        day_end_hour: "Fim do dia",
+        week_starts_on: "Primeiro dia da semana",
+        default_duration: "Duração padrão do compromisso (min)",
+        sunday: "Domingo",
+        monday: "Segunda-feira",
+      },
       preferences: "Preferências",
       title: "Configurações",
       app_title: "Título do App",
       sections: {
         branding: "Identidade Visual",
         pipelines: "Funis",
+        agenda: "Agenda",
       },
       pipelines: {
         add: "Adicionar Funil",

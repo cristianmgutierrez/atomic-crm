@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import { useStore } from "ra-core";
 
-import type { ContactStatus, LabeledValue, TaskType } from "../types";
+import type {
+  CalendarSettings,
+  ContactStatus,
+  LabeledValue,
+  TaskType,
+} from "../types";
 import { defaultConfiguration } from "./defaultConfiguration";
 
 export const CONFIGURATION_STORE_KEY = "app.configuration";
@@ -12,6 +17,7 @@ export interface ConfigurationContextValue {
   dealCategories: LabeledValue[];
   contactStatuses: ContactStatus[];
   taskTypes: TaskType[];
+  calendarSettings: CalendarSettings;
   title: string;
   darkModeLogo: string;
   lightModeLogo: string;

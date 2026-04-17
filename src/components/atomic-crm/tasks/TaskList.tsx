@@ -21,11 +21,29 @@ import { TaskPageFilter } from "./TaskPageFilter";
 import { isOverdue, isDueToday } from "./tasksPredicate";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { formatTimeRange, getTaskTypeWithIcon } from "./taskModel";
+import { TaskListViewToggle, type TaskViewMode } from "./TaskListViewToggle";
+import { WeekCalendar } from "./calendar/WeekCalendar";
+import { SalesUserPicker } from "./SalesUserPicker";
 
 // ─── Actions toolbar ──────────────────────────────────────────────────────────
 
-const TaskListActions = () => (
+const TaskListActions = ({
+  viewMode,
+  onViewModeChange,
+  selectedSalesId,
+  onSelectedSalesIdChange,
+}: {
+  viewMode: TaskViewMode;
+  onViewModeChange: (v: TaskViewMode) => void;
+  selectedSalesId: Identifier | undefined;
+  onSelectedSalesIdChange: (value: Identifier) => void;
+}) => (
   <TopToolbar>
+    <SalesUserPicker
+      value={selectedSalesId}
+      onChange={onSelectedSalesIdChange}
+    />
+    <TaskListViewToggle value={viewMode} onChange={onViewModeChange} />
     <AddTask selectContact display="chip" />
   </TopToolbar>
 );
@@ -215,15 +233,40 @@ const TaskListLayoutDesktop = () => {
 
 export const TaskList = () => {
   const { identity } = useGetIdentity();
+  const [viewMode, setViewMode] = useState<TaskViewMode>("list");
+  const [selectedSalesId, setSelectedSalesId] = useState<
+    Identifier | undefined
+  >();
+
+  const effectiveSalesId = selectedSalesId ?? identity?.id;
 
   if (!identity) return null;
+
+  const actions = (
+    <TaskListActions
+      viewMode={viewMode}
+      onViewModeChange={setViewMode}
+      selectedSalesId={effectiveSalesId}
+      onSelectedSalesIdChange={setSelectedSalesId}
+    />
+  );
+
+  if (viewMode === "calendar") {
+    return (
+      <div className="flex flex-col gap-4">
+        {actions}
+        <WeekCalendar salesId={effectiveSalesId} />
+      </div>
+    );
+  }
 
   return (
     <List
       title={false}
-      actions={<TaskListActions />}
+      actions={actions}
       perPage={25}
       sort={{ field: "due_date", order: "ASC" }}
+      filter={{ sales_id: effectiveSalesId }}
     >
       <TaskListLayoutDesktop />
     </List>

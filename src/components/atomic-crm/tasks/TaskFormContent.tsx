@@ -8,10 +8,13 @@ import { RichTextInput } from "@/components/admin/rich-text-input";
 import { FileInput } from "@/components/admin/file-input";
 import { required, useGetOne, useTranslate } from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
+import { CalendarDays } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { contactOptionText } from "../misc/ContactOption";
 import { AttachmentField } from "./AttachmentField";
 import { TaskTypeIconBar } from "./TaskTypeIconBar";
+import { DailyAgenda } from "./calendar/DailyAgenda";
 import type { Deal } from "../types";
 
 /** Adds 60 minutes to a HH:MM string. Returns null if result overflows midnight. */
@@ -36,6 +39,7 @@ export const TaskFormContent = () => {
 
   // Local error state — for display only (below the grid)
   const [dateTimeError, setDateTimeError] = useState<string | null>(null);
+  const [mobileAgendaOpen, setMobileAgendaOpen] = useState(false);
 
   // Validation functions that integrate with react-hook-form to block submit
   const validateEndDate = useCallback(
@@ -118,96 +122,119 @@ export const TaskFormContent = () => {
   }, [endDate, dueDate, endTime, startTime]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <TextInput
-        autoFocus
-        source="text"
-        label={translate("resources.tasks.inputs.text")}
-        validate={required()}
-        className="m-0"
-        helperText={false}
-      />
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
+      <div className="flex flex-col gap-4 min-w-0">
+        <TextInput
+          autoFocus
+          source="text"
+          label={translate("resources.tasks.inputs.text")}
+          validate={required()}
+          className="m-0"
+          helperText={false}
+        />
 
-      <TaskTypeIconBar
-        source="type"
-        label={translate("resources.tasks.inputs.type")}
-        validate={required()}
-        defaultValue="call"
-      />
+        <TaskTypeIconBar
+          source="type"
+          label={translate("resources.tasks.inputs.type")}
+          validate={required()}
+          defaultValue="call"
+        />
 
-      <div className="flex flex-col gap-1">
-        <div className="grid grid-cols-[1fr_auto_auto_1fr] gap-2 items-end">
-          <DatePickerInput
-            source="due_date"
-            label={translate("resources.tasks.inputs.due_date")}
+        <div className="flex flex-col gap-1">
+          <div className="grid grid-cols-[1fr_auto_auto_1fr] gap-2 items-end">
+            <DatePickerInput
+              source="due_date"
+              label={translate("resources.tasks.inputs.due_date")}
+              helperText={false}
+              validate={required()}
+            />
+            <TimePickerSelect
+              source="start_time"
+              label={false}
+              helperText={false}
+              placeholder={translate("resources.tasks.inputs.start_time")}
+              clearable
+            />
+            <TimePickerSelect
+              source="end_time"
+              label={false}
+              helperText={false}
+              placeholder={translate("resources.tasks.inputs.end_time")}
+              clearable
+              validate={validateEndTime}
+              className="[&_[data-slot=form-message]]:hidden"
+            />
+            <DatePickerInput
+              source="end_date"
+              label={translate("resources.tasks.inputs.end_date")}
+              helperText={false}
+              validate={validateEndDate}
+              className="[&_[data-slot=form-message]]:hidden"
+            />
+          </div>
+          {dateTimeError && (
+            <p className="text-destructive text-sm">{dateTimeError}</p>
+          )}
+        </div>
+
+        <RichTextInput
+          source="notes"
+          label={translate("resources.tasks.inputs.notes")}
+          helperText={false}
+          placeholder={translate("resources.tasks.inputs.notes_placeholder")}
+        />
+
+        <ReferenceInput source="deal_id" reference="deals">
+          <AutocompleteInput
+            label={translate("resources.tasks.inputs.deal_id")}
+            optionText="name"
+            helperText={false}
+          />
+        </ReferenceInput>
+
+        <ReferenceInput source="contact_id" reference="contacts_summary">
+          <AutocompleteInput
+            label={translate("resources.tasks.inputs.contact_id")}
+            optionText={contactOptionText}
             helperText={false}
             validate={required()}
+            onChange={() => {
+              userSelectedContact.current = true;
+            }}
           />
-          <TimePickerSelect
-            source="start_time"
-            label={false}
-            helperText={false}
-            placeholder={translate("resources.tasks.inputs.start_time")}
-            clearable
-          />
-          <TimePickerSelect
-            source="end_time"
-            label={false}
-            helperText={false}
-            placeholder={translate("resources.tasks.inputs.end_time")}
-            clearable
-            validate={validateEndTime}
-            className="[&_[data-slot=form-message]]:hidden"
-          />
-          <DatePickerInput
-            source="end_date"
-            label={translate("resources.tasks.inputs.end_date")}
-            helperText={false}
-            validate={validateEndDate}
-            className="[&_[data-slot=form-message]]:hidden"
-          />
+        </ReferenceInput>
+
+        <FileInput
+          source="attachments"
+          label={translate("resources.tasks.inputs.attachments", {
+            _: "Anexos",
+          })}
+          multiple
+        >
+          <AttachmentField source="src" title="title" target="_blank" />
+        </FileInput>
+
+        <div className="lg:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setMobileAgendaOpen((o) => !o)}
+          >
+            <CalendarDays className="size-4 mr-2" />
+            {translate("resources.tasks.agenda.show")}
+          </Button>
+          {mobileAgendaOpen && (
+            <div className="mt-3">
+              <DailyAgenda setValue={setValue} />
+            </div>
+          )}
         </div>
-        {dateTimeError && (
-          <p className="text-destructive text-sm">{dateTimeError}</p>
-        )}
       </div>
 
-      <RichTextInput
-        source="notes"
-        label={translate("resources.tasks.inputs.notes")}
-        helperText={false}
-        placeholder={translate("resources.tasks.inputs.notes_placeholder")}
-      />
-
-      <ReferenceInput source="deal_id" reference="deals">
-        <AutocompleteInput
-          label={translate("resources.tasks.inputs.deal_id")}
-          optionText="name"
-          helperText={false}
-        />
-      </ReferenceInput>
-
-      <ReferenceInput source="contact_id" reference="contacts_summary">
-        <AutocompleteInput
-          label={translate("resources.tasks.inputs.contact_id")}
-          optionText={contactOptionText}
-          helperText={false}
-          validate={required()}
-          onChange={() => {
-            userSelectedContact.current = true;
-          }}
-        />
-      </ReferenceInput>
-
-      <FileInput
-        source="attachments"
-        label={translate("resources.tasks.inputs.attachments", {
-          _: "Anexos",
-        })}
-        multiple
-      >
-        <AttachmentField source="src" title="title" target="_blank" />
-      </FileInput>
+      <aside className="hidden lg:block lg:sticky lg:top-0 lg:self-start min-w-0">
+        <DailyAgenda setValue={setValue} />
+      </aside>
     </div>
   );
 };

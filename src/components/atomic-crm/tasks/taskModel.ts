@@ -1,7 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import type { Identifier } from "ra-core";
+import type { UseFormSetValue } from "react-hook-form";
 
 import type { TaskType } from "../types";
+import { formatMinutesToHHMM } from "./calendar/calendarUtils";
 import { getTaskTypeIcon } from "./TaskTypeIconBar";
 
 /**
@@ -49,4 +51,24 @@ export function getTaskTypeWithIcon(
   const taskType = taskTypes.find((t) => t.value === taskTypeValue);
   const Icon = getTaskTypeIcon(taskType?.icon);
   return { taskType, Icon };
+}
+
+/**
+ * Applies a calendar slot click to the task form. Updates due_date/end_date to the navigated
+ * day and start_time/end_time to the clicked slot (+ default duration). Used by DailyAgenda
+ * so navigating the agenda and clicking actually reschedules the task being edited/created.
+ */
+export function applySlotSelection(
+  setValue: UseFormSetValue<Record<string, any>>,
+  agendaDateISO: string,
+  slotMinutes: number,
+  defaultDurationMin: number,
+): void {
+  const endMinutes = Math.min(24 * 60 - 1, slotMinutes + defaultDurationMin);
+  setValue("due_date", agendaDateISO, { shouldDirty: true });
+  setValue("end_date", agendaDateISO, { shouldDirty: true });
+  setValue("start_time", formatMinutesToHHMM(slotMinutes), {
+    shouldDirty: true,
+  });
+  setValue("end_time", formatMinutesToHHMM(endMinutes), { shouldDirty: true });
 }

@@ -27,6 +27,7 @@ import {
   type ConfigurationContextValue,
 } from "../root/ConfigurationContext";
 import { defaultConfiguration } from "../root/defaultConfiguration";
+import { CalendarSettingsCard } from "./CalendarSettings";
 import { PipelinesSettings } from "./PipelinesSettings";
 import { TaskIconPickerInput } from "./TaskIconPickerInput";
 
@@ -53,6 +54,11 @@ const SECTIONS = [
     fallback: "Funis",
   },
   { id: "tasks", label: "resources.tasks.name", fallback: "Tasks" },
+  {
+    id: "agenda",
+    label: "crm.settings.sections.agenda",
+    fallback: "Agenda",
+  },
 ];
 
 /** Ensure every item in a { value, label } array has a value (slug from label). */
@@ -137,6 +143,7 @@ const transformFormValues = (data: Record<string, any>) => ({
     dealCategories: ensureValues(data.dealCategories),
     taskTypes: ensureValues(data.taskTypes),
     contactStatuses: ensureValues(data.contactStatuses),
+    calendarSettings: data.calendarSettings,
   } as ConfigurationContextValue,
 });
 
@@ -183,6 +190,7 @@ const SettingsForm = () => {
       dealCategories: config.dealCategories,
       taskTypes: config.taskTypes,
       contactStatuses: config.contactStatuses,
+      calendarSettings: config.calendarSettings,
     }),
     [config],
   );
@@ -399,6 +407,9 @@ const SettingsFormFields = () => {
             </ArrayInput>
           </CardContent>
         </Card>
+
+        {/* Agenda */}
+        <CalendarSettingsCard />
       </div>
 
       {/* Sticky save button */}

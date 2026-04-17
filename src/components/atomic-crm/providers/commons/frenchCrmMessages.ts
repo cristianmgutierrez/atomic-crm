@@ -372,6 +372,24 @@ export const frenchCrmMessages = {
         end_time_before_start:
           "L'heure de fin doit être postérieure à l'heure de début",
       },
+      agenda: {
+        title: "Agenda du jour",
+        show: "Voir l'agenda",
+        previous_day: "Jour précédent",
+        next_day: "Jour suivant",
+        today: "Aujourd'hui",
+        empty: "Aucun événement ce jour",
+      },
+      view: {
+        list: "Liste",
+        calendar: "Calendrier",
+      },
+      calendar: {
+        previous_week: "Semaine précédente",
+        next_week: "Semaine suivante",
+        today: "Aujourd'hui",
+        all_day: "Toute la journée",
+      },
     },
     tags: {
       name: "Étiquette |||| Étiquettes",
@@ -525,6 +543,17 @@ export const frenchCrmMessages = {
       sections: {
         branding: "Image de marque",
         pipelines: "Pipelines",
+        agenda: "Agenda",
+      },
+      agenda: {
+        slot_interval: "Intervalle du créneau",
+        slot_interval_help: "Durée de chaque ligne horaire de l'agenda",
+        day_start_hour: "Début de la journée",
+        day_end_hour: "Fin de la journée",
+        week_starts_on: "Premier jour de la semaine",
+        default_duration: "Durée par défaut d'un rendez-vous (min)",
+        sunday: "Dimanche",
+        monday: "Lundi",
       },
       pipelines: {
         add: "Ajouter un pipeline",

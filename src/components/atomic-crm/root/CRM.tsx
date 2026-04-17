@@ -41,6 +41,7 @@ import {
 } from "./ConfigurationContext";
 import type { CrmDataProvider } from "../providers/types";
 import {
+  defaultCalendarSettings,
   defaultCompanySectors,
   defaultContactStatuses,
   defaultCurrency,
@@ -116,6 +117,7 @@ export const CRM = ({
   lightModeLogo = defaultLightModeLogo,
   contactStatuses = defaultContactStatuses,
   taskTypes = defaultTaskTypes,
+  calendarSettings = defaultCalendarSettings,
   title = defaultTitle,
   dataProvider = defaultDataProviderBuilder(),
   authProvider = defaultAuthProviderBuilder(),
@@ -151,6 +153,7 @@ export const CRM = ({
         dealCategories,
         contactStatuses,
         taskTypes,
+        calendarSettings,
         title,
         darkModeLogo,
         lightModeLogo,

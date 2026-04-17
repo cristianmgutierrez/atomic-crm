@@ -183,6 +183,14 @@ export type TaskType = {
   icon?: string;
 };
 
+export interface CalendarSettings {
+  slotInterval: 15 | 30 | 60;
+  dayStartHour: number;
+  dayEndHour: number;
+  weekStartsOn: 0 | 1;
+  defaultDurationMin: number;
+}
+
 export type Task = {
   contact_id: Identifier;
   type: string;
